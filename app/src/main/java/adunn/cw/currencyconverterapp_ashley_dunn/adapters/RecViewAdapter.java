@@ -45,7 +45,6 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         dataSet = rates != null ? rates : new ArrayList<>();
         notifyDataSetChanged();
     }
-
     // New method to get a CurrencyRate at a specific position
     public CurrencyRate getItem(int position) {
         if (position >= 0 && position < dataSet.size()) {
