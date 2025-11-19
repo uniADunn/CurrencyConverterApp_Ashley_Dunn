@@ -1,6 +1,5 @@
 package adunn.cw.currencyconverterapp_ashley_dunn;
 
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,9 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-
 import java.util.ArrayList;
-
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ErrorFeed;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.RatesFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.SearchFragment;
@@ -33,18 +29,16 @@ import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.RssFeedData;
 import adunn.cw.currencyconverterapp_ashley_dunn.threads.RSSCurrency;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
-public class MainActivity extends AppCompatActivity implements SearchFragment.OnSearchListener{
+public class MainActivity extends AppCompatActivity implements SearchFragment.OnSearchListener
+{
     private static final int RSS_FEED_DATA_UPDATE = 1;//update message from thread rss feed data
     private static final int RSS_RATES_DATA_UPDATE = 2;//update message from thread rates data
-
     private SearchFragment searchFrag; //search fragment
     private RatesFragment ratesFrag; //rates fragment
     private ErrorFeed errorFeedFrag; //error fragment
     private boolean showSearch = false; //flag to show search fragment
     private CurrencyViewModel currencyVM; //currency view model
     private Handler updateUIHandler; //handler for updating UI
-
-
     // on create
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +60,9 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         createUpdateUIHandler();
         //update rss data
         updateRssData();
-        openFragment(ratesFrag);
+        //openFragment(ratesFrag);
+        openFragment();
+        //refresh data
     }
     private void setToolbar(){
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -77,41 +73,59 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar_menu, menu);
+
+        if(currencyVM.isFiltered()){
+            menu.findItem(R.id.action_filterToggle).setTitle("All Rates");
+            menu.findItem(R.id.action_search).setVisible(false).setEnabled(false);
+        }
+        else{
+            menu.findItem(R.id.action_filterToggle).setTitle("Common Rates");
+            menu.findItem(R.id.action_search).setVisible(true).setEnabled(true);
+        }
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Currency Rates");
         return true;
     }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
-
-        if (item.getItemId() == R.id.action_search) {
-            showSearch = !showSearch;
-            if(showSearch){
-
-                if(!currencyVM.isFiltered()) {
-                    openFragment(searchFrag);
+        //check which item was selected
+        if (item.getItemId() == R.id.action_search) {//search item
+            showSearch = !showSearch; //flip flag
+            if(showSearch){//if flag is true
+                if(!currencyVM.isFiltered()) {//check if filter toggle not filtering for common
+                    openSearchFragment();
                 }
                 else{
+                    //list is filtered close the search fragment
                     closeFragment(searchFrag);
                 }
             }
             else{
+                //show search is flipped to false, close the search fragment
                 closeFragment(searchFrag);
             }
         }
-        else if(item.getItemId() == R.id.action_filterToggle){
-            boolean isFiltered = currencyVM.isFiltered();
-            isFiltered = !isFiltered;
-            currencyVM.setFiltered(isFiltered);
+        if(item.getItemId() == R.id.action_filterToggle){//filter rates toggle
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
 
-            if (isFiltered) {
+            boolean isFiltered = currencyVM.isFiltered();//get current filter state
+            isFiltered = !isFiltered;//flip state
+            currencyVM.setFiltered(isFiltered);//set the state in the viewmodel
+
+            if (isFiltered) {//filter is on
                 item.setTitle("All Rates");
-            } else {
+                searchItem.setVisible(false).setEnabled(false);
+            } else {//filter is off
                 item.setTitle("Common Rates");
+                searchItem.setVisible(true).setEnabled(true);
             }
-            closeFragment(searchFrag);
-            showSearch = false;
-            ratesFrag.updateRecView();
 
+            closeFragment(searchFrag);//closes search fragment
+            showSearch = false;//sets state
+            ratesFrag.updateRecView();//updates the view
         }
+        ratesFrag.updateRecView();
         return true;
     }
     private void createFragments(){
@@ -119,18 +133,24 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         ratesFrag = new RatesFragment();
         errorFeedFrag = new ErrorFeed();
     }
-    private void openFragment(Fragment fragment){
+    public void openFragment() {
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        if(fragment instanceof SearchFragment){
-            transaction.replace(R.id.searchFragment_container, searchFrag);
-        }
-        else if(fragment instanceof RatesFragment){
-            transaction.replace(R.id.main_frame_layout, ratesFrag);
-        }
-        else if(fragment instanceof ErrorFeed){
+        if (currencyVM.getRates() == null || currencyVM.getRates().isEmpty()) {
+            Log.d("MainActivity", "Displaying error feed fragment.");
             transaction.replace(R.id.main_frame_layout, errorFeedFrag);
         }
+        else {
+            Log.d("MainActivity", "Displaying rates fragment.");
+            ratesFrag.updateRecView();
+            transaction.replace(R.id.main_frame_layout, ratesFrag);
+        }
+        transaction.commit();
+    }
+    private void openSearchFragment(){
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.searchFragment_container, searchFrag);
         transaction.commit();
     }
     private void closeFragment(Fragment fragment){
@@ -154,10 +174,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     currencyVM.setRssFeedData((RssFeedData) msg.obj);
                     currencyVM.setLastPublished(currencyVM.getRssFeedData().getLastBuildDate());
 
-                    // If error fragment was showing, replace it with rates fragment
-//                    if (getSupportFragmentManager().findFragmentById(R.id.main_frame_layout) instanceof ErrorFeed) {
-//                        openFragment(ratesFrag);
-//                    }
                     //makes toast to show data was updated.
                     Toast.makeText(getApplicationContext(),
                                     "RSS Data Updated",
@@ -167,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                 //check the message type
                 else if(msg.what == RSS_RATES_DATA_UPDATE){
                     if(msg.obj instanceof ArrayList){
-                        currencyVM.setRates((ArrayList<CurrencyRate>)msg.obj);
+                        currencyVM.setRates((ArrayList<CurrencyRate>) msg.obj);
                         //-----------could do this in the buildRatesList on the View model.--------------
                         for (CurrencyRate r : currencyVM.getRates()) {
                             r.extractTitle();
@@ -177,11 +193,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                         //--------------------------------------------------------------------------------
                         //update the rates fragment
                         ratesFrag.updateRecView();
-
-                        // If error fragment was showing, replace it with rates fragment
-//                        if (getSupportFragmentManager().findFragmentById(R.id.main_frame_layout) instanceof ErrorFeed) {
-//                            openFragment(ratesFrag);
-//                        }
+                        openFragment();
                         //makes toast to show rates data was updated
                         Toast.makeText(getApplicationContext(),
                                         "Rates Updated",

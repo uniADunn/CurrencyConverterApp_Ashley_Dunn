@@ -2,10 +2,13 @@ package adunn.cw.currencyconverterapp_ashley_dunn.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import adunn.cw.currencyconverterapp_ashley_dunn.R;
 import adunn.cw.currencyconverterapp_ashley_dunn.adapters.RecViewAdapter;
@@ -39,14 +43,26 @@ public class RatesFragment extends Fragment implements RecViewAdapter.OnRateClic
     @Override
     public void onRateClick(int position){
         CurrencyRate rate = rcAdapter.getItem(position);
-        if (rate != null) {
-            currencyVM.setRateSelected(rate);
-            currencyVM.setFiltered(true);
-        }
-
         FragmentManager manager = requireActivity().getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
+
+        if (rate != null) {
+            currencyVM.setRateSelected(rate);
+            Toolbar toolbar = requireActivity().findViewById(R.id.toolbar);
+            Menu menu = toolbar.getMenu();
+            //set title
+            toolbar.setTitle("Currency Conversion");
+            //hide search icon
+            MenuItem item = menu.findItem(R.id.action_search);
+            item.setVisible(false);
+            //close search fragment
+
+            //hide filter toggle
+            MenuItem item2 = menu.findItem(R.id.action_filterToggle);
+            item2.setVisible(false);
+        }
         transaction.replace(R.id.main_frame_layout, new ConversionFragment());
+        transaction.replace(R.id.searchFragment_container, new Fragment());
         transaction.addToBackStack(null);
         transaction.commit();
         rcRates.setAdapter(rcAdapter);
@@ -66,12 +82,12 @@ public class RatesFragment extends Fragment implements RecViewAdapter.OnRateClic
     }
     public void updateRecView(){
         if(rcAdapter != null && currencyVM != null){
-            if(currencyVM.getRssFeedData() != null && currencyVM.getRates() != null){
-                ArrayList<CurrencyRate> rates = currencyVM.buildRateLists();
-                rcAdapter.updateData(rates);
+            if(currencyVM.getRates() != null){
+                if(!currencyVM.getRates().isEmpty()) {
+                    ArrayList<CurrencyRate> rates = currencyVM.buildRateLists();
+                    rcAdapter.updateData(rates);
+                }
             }
-
-
         }
     }
 }

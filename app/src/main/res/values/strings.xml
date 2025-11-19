@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CurrencyConverterApp_Ashley_Dunn</string>
+    <string name="app_name">Currency Rates</string>
     <string name="currency_code">Currency Code: </string>
     <string name="title">Title: </string>
     <string name="rate">Rate: </string>

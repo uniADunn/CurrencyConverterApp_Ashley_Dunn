@@ -24,11 +24,14 @@ public class RSSCurrency implements Runnable{
     private final static int RSS_FEED_DATA_UPDATE = 1; //update feed data message
     private final static int RSS_RATES_DATA_UPDATE = 2; //update rates feed data message
 
-    private final String urlSource = "https://www.fx-exchange.com/gbp/rss.xml"; //url source: https://www.fx-exchange.com/gbp/rss.xml
+    private static String urlSource = ""; //url source: https://www.fx-exchange.com/gbp/rss.xml
     private String result= "";//result of parsing
     private Handler rssDataHandler; //handler for updating UI
     private ArrayList<CurrencyRate> rates; //list of currency rates
     //CONSTRUCTOR
+    public static void setURLTEST(String url){
+        urlSource = url;
+    }
     public RSSCurrency(Handler uiHandler){
         rates = new ArrayList<>();
         rssDataHandler = uiHandler;
@@ -84,27 +87,25 @@ public class RSSCurrency implements Runnable{
             while(eventType != XmlPullParser.END_DOCUMENT){
 
                 if(eventType == XmlPullParser.START_TAG){
-                    Log.d("Event Type: START_TAG", xpp.getName());
-
+                    //Log.d("Event Type: START_TAG", xpp.getName());
                     if(xpp.getName().equalsIgnoreCase("item")){
                         isItem = true;
                         currencyRate = new CurrencyRate();
                     }
                     //get rss version (attributes)
                     if (xpp.getName().equalsIgnoreCase("rss")) {
-                        Log.d("RSS", "Attribute name: " + xpp.getAttributeName(0) +
-                                "\nAttribute Value: " + xpp.getAttributeValue(0));
+                        //Log.d("RSS", "Attribute name: " + xpp.getAttributeName(0) +
+                                //"\nAttribute Value: " + xpp.getAttributeValue(0));
                         rssFeedData.setStrVersionNumber(xpp.getAttributeValue(0));
                     }
                     //check if title is item or rss feed
                     else if (xpp.getName().equalsIgnoreCase("title")) {
                         text = xpp.nextText();
                         if (!isItem) {
-                            Log.d("RSSData Title", "text:" + text);
+                            //Log.d("RSSData Title", "text:" + text);
                             rssFeedData.setTitle(text);
                         } else {
-                            Log.d("ItemData Title", "text: " + text);
-                            //itemDataList.add(text);
+                            //Log.d("ItemData Title", "text: " + text);
                             if (currencyRate != null) {
                                 currencyRate.setTitle(text);
                             }
@@ -114,11 +115,10 @@ public class RSSCurrency implements Runnable{
                     else if (xpp.getName().equalsIgnoreCase("link")) {
                         text = xpp.nextText();
                         if (!isItem) {
-                            Log.d("RSSData Link", "text: " + text);
+                            //Log.d("RSSData Link", "text: " + text);
                             rssFeedData.setLink(text);
                         } else {
-                            Log.d("ItemData Link", "text: " + text);
-                            //itemDataList.add(text);
+                            //Log.d("ItemData Link", "text: " + text);
                             if (currencyRate != null) {
                                 currencyRate.setLink(text);
                             }
@@ -128,11 +128,10 @@ public class RSSCurrency implements Runnable{
                     else if (xpp.getName().equalsIgnoreCase("description")) {
                         text = xpp.nextText();
                         if (!isItem) {
-                            Log.d("RSSData Description", "text: " + text);
+                            //Log.d("RSSData Description", "text: " + text);
                             rssFeedData.setDescription(text);
                         } else {
-                            Log.d("ItemData Description", "text: " + text);
-                            //itemDataList.add(text);
+                            //Log.d("ItemData Description", "text: " + text);
                             if (currencyRate != null) {
                                 currencyRate.setDescription(text);
                             }
@@ -141,51 +140,48 @@ public class RSSCurrency implements Runnable{
                     //rss feed unique data
                     else if (xpp.getName().equalsIgnoreCase("lastbuilddate")) {
                         text = xpp.nextText();
-                        Log.d("RSSData LastBuildDate", "text: " + text);
+                        //Log.d("RSSData LastBuildDate", "text: " + text);
                         rssFeedData.setLastBuildDate(text);
                     } else if (xpp.getName().equalsIgnoreCase("language")) {
                         text = xpp.nextText();
-                        Log.d("RSSData Language", "text: " + text);
+                        //Log.d("RSSData Language", "text: " + text);
                         rssFeedData.setLanguage(text);
                     } else if (xpp.getName().equalsIgnoreCase("copyright")) {
                         text = xpp.nextText();
-                        Log.d("RSSData Copyright", "text: " + text);
+                        //Log.d("RSSData Copyright", "text: " + text);
                         rssFeedData.setCopyright(text);
                     } else if (xpp.getName().equalsIgnoreCase("docs")) {
                         text = xpp.nextText();
-                        Log.d("RSSData Doc", "text: " + text);
+                        //Log.d("RSSData Doc", "text: " + text);
                         rssFeedData.setDoc(text);
                     } else if (xpp.getName().equalsIgnoreCase("ttl")) {
                         text = xpp.nextText();
-                        Log.d("RSSData TTL", "text: " + text);
+                        //Log.d("RSSData TTL", "text: " + text);
                         rssFeedData.setTtl(text);
                     }
                     //item data unique data
                     else if (xpp.getName().equalsIgnoreCase("guid")) {
                         text = xpp.nextText();
-                        Log.d("ItemData GUID", "text: " + text);
-                        //itemDataList.add(text);
+                        //Log.d("ItemData GUID", "text: " + text);
                         if (currencyRate != null) {
                             currencyRate.setGuid(text);
                         }
                     } else if (xpp.getName().equalsIgnoreCase("pubdate")) {
                         text = xpp.nextText();
-                        Log.d("ItemData PubDate", "text: " + text);
-                        //itemDataList.add(text);
+                        //Log.d("ItemData PubDate", "text: " + text);
                         if (currencyRate != null) {
                             currencyRate.setPubDate(text);
                         }
                     } else if (xpp.getName().equalsIgnoreCase("category")) {
                         text = xpp.nextText();
-                        Log.d("ItemData Category", "text: " + text);
-                        //itemDataList.add(text);
+                        //Log.d("ItemData Category", "text: " + text);
                         if (currencyRate != null) {
                             currencyRate.setCategory(text);
                         }
 
                     }
                 } else if (eventType == XmlPullParser.END_TAG) {
-                    Log.d("Event type: END_TAG", xpp.getName());
+                    //Log.d("Event type: END_TAG", xpp.getName());
                     if (xpp.getName().equalsIgnoreCase("item")) {
                         isItem = false;
                         if (currencyRate != null) {

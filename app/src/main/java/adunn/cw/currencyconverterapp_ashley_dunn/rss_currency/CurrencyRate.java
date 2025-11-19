@@ -52,7 +52,6 @@ public class CurrencyRate {
 
     public void extractTitle(){
         if (this.title == null) {
-            Log.w("CurrencyRate", "Title is null when calling extractTitle(). Initializing to empty string.");
             this.title = "";
             this.countryCode = "";
             return;
@@ -62,7 +61,6 @@ public class CurrencyRate {
         if (i != -1) {
             title = temp.substring(i + 1).trim();
         } else {
-            Log.w("CurrencyRate", "Title '" + temp + "' does not contain '/', cannot extract. Using original title.");
             title = temp.trim();
         }
 
@@ -71,26 +69,23 @@ public class CurrencyRate {
             String code = title.substring(openParenIndex);
             extractCode(code);
             title = title.substring(0, openParenIndex);
-        } else {
-            Log.w("CurrencyRate", "Title '" + title + "' does not contain '(', cannot extract country code.");
         }
-        Log.d("Title extracted", title);
+        //Log.d("Title extracted", title);
     }
     public void extractCode(String code){
         //set country code
         countryCode = code.substring(code.lastIndexOf("(")+1, code.lastIndexOf(")"));
-        Log.d("code extracted", countryCode);
+        //Log.d("code extracted", countryCode);
     }
     public void extractRate(){
         if (this.description == null) {
-            Log.w("CurrencyRate", "Description is null when calling extractRate(). Initializing to empty string.");
             this.description = "";
             this.strRate = "0";
             this.rate = 0.0;
             return;
         }
         String temp = this.description;
-        Log.d("description", temp);
+        //Log.d("description", temp);
         int i = temp.indexOf("=");
         if (i != -1) {
             temp = temp.substring(i + 1).trim();
@@ -103,21 +98,19 @@ public class CurrencyRate {
             }
             this.strRate = rateBuilder.toString();
         } else {
-            Log.w("CurrencyRate", "Description '" + temp + "' does not contain '=', cannot extract rate. Setting strRate to '0'.");
             this.strRate = "0";
         }
-        Log.d("rate", this.strRate);
+        //Log.d("rate", this.strRate);
     }
     public void rateConvert(){
         try{
             this.rate = Double.parseDouble(this.strRate);
         }
         catch (NumberFormatException nfe){
-            Log.d("NumberFormatException", nfe.getMessage());
+            Log.d("NumberFormatException", nfe.getMessage() + " Error formatting number");
             this.rate = 0;
         }
     }
-
     @NonNull
     @Override
     public String toString(){
