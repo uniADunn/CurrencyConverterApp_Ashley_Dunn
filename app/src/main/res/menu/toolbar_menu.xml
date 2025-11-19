@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        app:showAsAction="always"
+        android:icon="@drawable/search_icon"
+        android:title="search"
+        />
+    <item
+        android:id="@+id/action_filterToggle"
+        app:showAsAction="always"
+        android:title="Common Rates"
+
+        />
+    <item
+        android:title="Settings">
+        <menu>
+
+        </menu>
+    </item>
+</menu>

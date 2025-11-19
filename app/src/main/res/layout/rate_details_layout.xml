@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <TextView
+        android:id="@+id/rcTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/title"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+        />
+    <TextView
+        android:id="@+id/rcTitleResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/rcTitle"
+        />
+
+    <TextView
+        android:id="@+id/rcCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/currency_code"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/rcTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rcCodeResult"
+        />
+    <TextView
+        android:id="@+id/rcCodeResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/rcTitleResult"
+        app:layout_constraintStart_toEndOf="@id/rcCode"
+        />
+
+
+
+    <TextView
+        android:id="@+id/rcRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/rate"
+        android:layout_marginStart="5dp"
+        android:textSize="16sp"
+
+        app:layout_constraintStart_toEndOf="@id/rcCodeResult"
+        app:layout_constraintTop_toBottomOf="@id/rcTitleResult"
+
+        />
+    <TextView
+        android:id="@+id/rcRateResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/rcRate"
+        app:layout_constraintTop_toBottomOf="@id/rcTitleResult"
+
+
+        />
+
+    <TextView
+        android:id="@+id/rcExchangeRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rcRateResult"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <ToggleButton
+        app:layout_constraintHorizontal_weight="0.30"
+        android:id="@+id/toggleConversion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textOn="GBP --> X"
+        android:textOff="X --> GBP"
+        android:checked="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/txtAmount"
+        />
+
+
+    <EditText
+        app:layout_constraintHorizontal_weight="0.40"
+        android:id="@+id/txtAmount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Amount"
+        android:textAlignment="textEnd"
+        android:inputType="numberDecimal"
+        android:layout_marginEnd="5dp"
+        android:padding="13dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/toggleConversion"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
