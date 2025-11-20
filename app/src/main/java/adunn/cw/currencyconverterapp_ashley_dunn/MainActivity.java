@@ -1,5 +1,7 @@
 package adunn.cw.currencyconverterapp_ashley_dunn;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,6 +10,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -61,8 +66,36 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         //update rss data
         updateRssData();
         //openFragment(ratesFrag);
+        welcomeDialogCustom();
         openFragment();
         //refresh data
+    }
+    private void welcomeDialogCustom(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View WelcomeDialogView = getLayoutInflater().inflate(R.layout.custom_welcome_dialog, null);
+        builder.setView(WelcomeDialogView);
+        builder.setTitle(R.string.string_welcome_dialog_title);
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener(){
+            @Override
+            public void onShow(DialogInterface d){
+                AlertDialog dialog = (AlertDialog) d;
+
+                TextView customDialogText = dialog.findViewById(R.id.customDialogText);
+                customDialogText.setText(R.string.string_welcome_dialog_text);
+
+                Button dialogBtn = dialog.findViewById(R.id.customDialogButton);
+                dialogBtn.setText(R.string.string_string_custom_dialog_button_text);
+                dialogBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        dialog.show();
     }
     private void setToolbar(){
         Toolbar toolbar = findViewById(R.id.toolbar);

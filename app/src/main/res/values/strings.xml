@@ -3,4 +3,7 @@
     <string name="currency_code">Currency Code: </string>
     <string name="title">Title: </string>
     <string name="rate">Rate: </string>
+    <string name="string_welcome_dialog_title">GBP Currency Converter</string>
+    <string name="string_welcome_dialog_text"><![CDATA[Welcome, This converter focuses on\n\t\tGBP —> currency (X)\nor\n\t\tcurrency (X) —> GBP.\nFuture updates may include:\n\t\tcurrency (X) —> currency (Z).]]></string>
+    <string name="string_string_custom_dialog_button_text">OK, Lets Go!</string>
 </resources>
