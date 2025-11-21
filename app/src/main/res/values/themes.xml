@@ -3,6 +3,19 @@
     <style name="Base.Theme.CurrencyConverterApp_Ashley_Dunn" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Primary brand colour -->
+        <item name="colorPrimary">@color/app_primary</item>
+        <item name="colorPrimaryVariant">@color/app_primary_variant</item>
+        <item name="colorOnPrimary">@color/app_on_primary</item>
+
+        <!-- Secondary / accent -->
+        <item name="colorSecondary">@color/app_secondary</item>
+        <item name="colorOnSecondary">@color/app_on_primary</item>
+
+        <!-- Backgrounds -->
+        <item name="android:colorBackground">@color/app_background</item>
+        <item name="colorSurface">@color/app_surface</item>
+        <item name="colorOnSurface">@android:color/black</item>
     </style>
 
     <style name="Theme.CurrencyConverterApp_Ashley_Dunn" parent="Base.Theme.CurrencyConverterApp_Ashley_Dunn" />

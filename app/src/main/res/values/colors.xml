@@ -2,7 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="pastel_red">#FDE2E4</color>
-    <color name="amber">#FFF4CE</color>
-    <color name="pastel_green">#E2F5E9</color>
+    <!--threshold colours for rates-->
+    <color name="pastel_red">#FECACA</color>
+    <color name="amber">#FDE68A</color>
+    <color name="pastel_green">#BBF7D0</color>
+    <!--app theme colours-->
+    <color name="app_primary">#0F766E</color>
+    <color name="app_primary_variant">#115E59</color>
+    <color name="app_secondary">#0891B2</color>
+    <color name="app_on_primary">#FFFFFF</color>
+
+    <color name="app_background">#F3F4F6</color>
+    <color name="app_surface">#FFFFFF</color>
+    <color name="app_on_surface">#111827</color>
 </resources>

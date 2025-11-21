@@ -4,10 +4,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.bumptech.glide.Glide;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,6 +25,7 @@ public class RateDetailsFragment extends Fragment {
     private TextView titleResult;
     private TextView rateResult;
     private TextView exchangeRate;
+    private ImageView flagImage;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,7 +33,16 @@ public class RateDetailsFragment extends Fragment {
         currencyVM = new ViewModelProvider(requireActivity()).get(CurrencyViewModel.class);
         setWidgets(v);
         observeVM();
+        addFlagImage();
         return v;
+    }
+    private void addFlagImage(){
+        CurrencyRate rate = currencyVM.getRateSelected().getValue();
+        if(rate.getFlagUrl() != null){
+            Glide.with(this.flagImage)
+                    .load(rate.getFlagUrl())
+                    .into(flagImage);
+        }
     }
     private void observeVM(){
         currencyVM.getRateSelected().observe(getViewLifecycleOwner(), rateSelected -> {
@@ -71,13 +84,17 @@ public class RateDetailsFragment extends Fragment {
             return;
         }
 
-        // Use rateSelected.getRate() instead of rateSelected.getStrRate()
         BigDecimal bdRate = calculateRate(inputAmount, String.valueOf(rateSelected.getRate()));
         if (bdRate.compareTo(BigDecimal.ZERO) <= 0) {
             exchangeRate.setText("--");
 
         } else {
-            exchangeRate.setText(bdRate.toString());
+            if(currencyVM.isGbpToX()){
+                exchangeRate.setText(rateSelected.getCountryCode() + " " + bdRate);
+            }
+            else {
+                exchangeRate.setText(  getString(R.string.gbp) +" " + bdRate);
+            }
 
         }
     }
@@ -102,10 +119,11 @@ public class RateDetailsFragment extends Fragment {
         }
     }
     private void setWidgets(View v){
-        codeResult = v.findViewById(R.id.rcCodeResult);
-        titleResult = v.findViewById(R.id.rcTitleResult);
-        rateResult = v.findViewById(R.id.rcRateResult);
+        codeResult = v.findViewById(R.id.rcCode);
+        titleResult = v.findViewById(R.id.rcTitle);
+        rateResult = v.findViewById(R.id.rcRate);
         exchangeRate = v.findViewById(R.id.rcExchangeRate);
+        flagImage = v.findViewById(R.id.imageFlag);
     }
 
 }
