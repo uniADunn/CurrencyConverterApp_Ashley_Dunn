@@ -8,6 +8,8 @@ import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.RssFeedData;
 
 public class CurrencyViewModel extends ViewModel {
+    private double lowThreshold;
+    private double highThreshold;
     private RssFeedData rssData;
     private ArrayList<CurrencyRate> rates;//hold rates
     private ArrayList<CurrencyRate> filteredRates; // holds filtered rates
@@ -56,6 +58,18 @@ public class CurrencyViewModel extends ViewModel {
             return c1.compareTo(c2);
         });
         return rates;
+    }
+    public void setLowThreshold(double low){
+        this.lowThreshold = low;
+    }
+    public void setHighThreshold(double high){
+        this.highThreshold = high;
+    }
+    public double getLowThreshold(){
+        return lowThreshold;
+    }
+    public double getHighThreshold(){
+        return highThreshold;
     }
     public void setRateSelected(CurrencyRate rate){
         rateSelectedLive.setValue(rate);

@@ -4,12 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:id="@+id/searchLbl"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/search_by_currency_title_or_code"
+        android:textSize="16sp"
+        android:padding="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/inputSearch"
+        app:layout_constraintBaseline_toBaselineOf="@id/inputSearch"/>
+
     <EditText
         android:id="@+id/inputSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="13dp"
-        android:layout_margin="2dp"
+        android:padding="10dp"
+        android:layout_marginEnd="4dp"
         android:textAlignment="textEnd"
         app:flow_horizontalAlign="end"
         app:layout_constraintTop_toTopOf="parent"

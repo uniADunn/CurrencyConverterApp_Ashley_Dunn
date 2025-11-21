@@ -26,6 +26,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ErrorFeed;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.RatesFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.SearchFragment;
@@ -218,12 +220,30 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     if(msg.obj instanceof ArrayList){
                         currencyVM.setRates((ArrayList<CurrencyRate>) msg.obj);
                         //-----------could do this in the buildRatesList on the View model.--------------
+                        ArrayList<Double> values = new ArrayList<>();
                         for (CurrencyRate r : currencyVM.getRates()) {
                             r.extractTitle();
                             r.extractRate();
                             r.rateConvert();
+                            r.createFlagUrlCode();
+                            values.add(r.getRate());
                         }
                         //--------------------------------------------------------------------------------
+                        //colour thresholds
+                        double lowThresh = 0;
+                        double highThresh = 0;
+                        if(!values.isEmpty()){
+                            Collections.sort(values);
+                        }
+                        int n = values.size();
+                        int lowIndex = n/3;
+                        int highIndex = (2* n) / 3;
+
+                        lowThresh = values.get(lowIndex);
+                        highThresh = values.get(highIndex);
+
+                        currencyVM.setLowThreshold(lowThresh);
+                        currencyVM.setHighThreshold(highThresh);
                         //update the rates fragment
                         ratesFrag.updateRecView();
                         openFragment();

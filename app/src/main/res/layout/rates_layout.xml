@@ -8,7 +8,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="5dp"
     android:paddingHorizontal="2dp"
-    android:paddingVertical="20dp"
+    android:paddingVertical="10dp"
     android:layout_marginBottom="8dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -37,22 +37,32 @@
         android:textAlignment="textStart"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="10dp"
+
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/rcCode"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/imageFlag"
         />
+
     <TextView
         android:id="@+id/rcRate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="rate"
-        android:textAlignment="textStart"
-        android:textSize="16sp"
         android:layout_marginEnd="10dp"
-        app:layout_constraintTop_toBottomOf="@id/rcTitle"
+        android:text="rate"
+        android:textAlignment="textEnd"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/imageFlag"
         app:layout_constraintStart_toStartOf="@id/rcTitle"
-        app:layout_constraintEnd_toEndOf="@id/rcTitle"
-        />
+        app:layout_constraintTop_toBottomOf="@id/rcTitle" />
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:id="@+id/imageFlag"
+        android:scaleType="centerCrop"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintStart_toEndOf="@id/rcTitle"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 
 

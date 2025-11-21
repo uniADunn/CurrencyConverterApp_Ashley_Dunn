@@ -4,10 +4,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -57,6 +60,7 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         private final TextView rcTitle;
         private final TextView rcRate;
         private final TextView rcCode;
+        private final ImageView imageFlag;
         private ConstraintLayout recViewLayout;
         private RecViewAdapter adapter; // Reference to the adapter
 
@@ -67,6 +71,7 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
             rcTitle = v.findViewById(R.id.rcTitle);
             rcRate = v.findViewById(R.id.rcRate);
             rcCode = v.findViewById(R.id.rcCode);
+            imageFlag = v.findViewById(R.id.imageFlag);
             recViewLayout = v.findViewById(R.id.recViewLayout);
 
             //define click listener for the viewholders view
@@ -89,6 +94,9 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         public TextView getRcCode(){
             return rcCode;
         }
+        public ImageView getImageFlag(){
+            return imageFlag;
+        }
         public ConstraintLayout getRecViewLayout(){
             return recViewLayout;
         }
@@ -106,28 +114,41 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
     //replace the contents of a view for one of the rates in the dataset
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position){
+        CurrencyRate rate = dataSet.get(position);
 
-        viewHolder.getRcTitle().setText(dataSet.get(position).getTitle());
-        viewHolder.getRcRate().setText(dataSet.get(position).getStrRate());
-        viewHolder.getRcCode().setText(dataSet.get(position).getCountryCode());
+        viewHolder.getRcTitle().setText(rate.getTitle());
+        viewHolder.getRcRate().setText(rate.getStrRate());
+        viewHolder.getRcCode().setText(rate.getCountryCode());
+        String flagUrl = rate.getFlagUrl();
+        if(flagUrl != null){
+            Glide.with(viewHolder.itemView.getContext())
+                    .load(flagUrl)
+                    .into(viewHolder.getImageFlag());
+        }
+        else{
+            viewHolder.getImageFlag().setImageDrawable(null);
+        }
 
 
 //---------Change colour depending on rate value----------------------------------------------------
         try {
-            float rateValue = Float.parseFloat(dataSet.get(position).getStrRate());
-            if(rateValue <= 3){
-                viewHolder.getRecViewLayout().setBackgroundColor(viewHolder.itemView.getResources().getColor(R.color.pastel_red, null));
+
+            double rateValue = rate.getRate();
+            double lowThresh = currencyVM.getLowThreshold();
+            double highThresh = currencyVM.getHighThreshold();
+
+            if(rateValue <= lowThresh){
+                viewHolder.getRecViewLayout().setBackgroundColor(viewHolder.itemView.getResources().getColor(R.color.pastel_red));
             }
-            else if(rateValue > 3 && rateValue <= 9){
-                viewHolder.getRecViewLayout().setBackgroundColor(viewHolder.itemView.getResources().getColor(R.color.yellow, null));
+            else if(rateValue <= highThresh){
+                viewHolder.getRecViewLayout().setBackgroundColor(viewHolder.itemView.getResources().getColor(R.color.amber));
             }
             else{
-                viewHolder.getRecViewLayout().setBackgroundColor(viewHolder.itemView.getResources().getColor(R.color.pastel_green, null));
+                viewHolder.getRecViewLayout().setBackgroundColor(viewHolder.itemView.getResources().getColor(R.color.pastel_green));
             }
-        } catch (NumberFormatException e) {
-            Log.e(TAG, "Error parsing rate value for color change: " + e.getMessage());
-            // Fallback to a default color or no color change if parsing fails
-            viewHolder.getRecViewLayout().setBackgroundColor(viewHolder.itemView.getResources().getColor(android.R.color.white, null));
+
+        } catch (Exception e) {
+            Log.d("Exception", e.getMessage());
         }
 //---------------------------------------------------------------------------------------------------
     }

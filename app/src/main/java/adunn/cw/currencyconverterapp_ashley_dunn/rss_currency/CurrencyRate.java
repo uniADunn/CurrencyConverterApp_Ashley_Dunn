@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 public class CurrencyRate {
     private String title;
     private String countryCode;
+    private String flagUrlCode;
+    private String flagUrl;
     private String strRate;
     private double rate;
     private String link;
@@ -16,6 +18,30 @@ public class CurrencyRate {
     private String category;
 
     public CurrencyRate(){}
+    public void createFlagUrlCode(){
+
+        //special cases
+        switch (countryCode){
+            case "EUR":
+                flagUrlCode = "eu";
+                break;
+            case "ANG":
+                flagUrlCode = "CW";
+                break;
+            default:
+                flagUrlCode = countryCode.substring(0,2).toUpperCase();
+        }
+        Log.d("flagUrlCode", flagUrlCode);
+        if(flagUrlCode.equals("eu")){
+            flagUrl = "https://flagcdn.com/w160/" + flagUrlCode + ".png";
+        }
+        else{
+            flagUrl = "https://flagsapi.com/" + flagUrlCode + "/shiny/64.png";
+        }
+    }
+    public String getFlagUrl(){
+        return flagUrl;
+    }
     public void setTitle(String title) {
         this.title = title;
     }
