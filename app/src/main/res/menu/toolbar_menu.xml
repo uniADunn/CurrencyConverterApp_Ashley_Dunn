@@ -12,17 +12,12 @@
         app:showAsAction="always"
         android:title="Common Rates"
         />
-
     <item
-        android:title="Settings">
-        <menu>
-
-
-        </menu>
-    </item>
+        android:id="@+id/action_reload"
+        android:title="Reload Data"/>
     <item
         android:id="@+id/action_Aknowledgements"
-        android:title="Aknowledgements">
+        android:title="Acknowledgements">
     </item>
     <item
         android:id="@+id/action_exit"

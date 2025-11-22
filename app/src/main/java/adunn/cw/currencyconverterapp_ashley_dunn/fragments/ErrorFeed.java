@@ -36,7 +36,8 @@ public class ErrorFeed extends Fragment {
             public void onClick(View v) {
                 RSSCurrency.setURLTEST("https://www.fx-exchange.com/gbp/rss.xml");// used for testing no rates available
                 ((MainActivity) requireActivity()).updateRssData();
-                //((MainActivity) requireActivity()).openFragment();
+                ((MainActivity) requireActivity()).openFragment(new LoadingFrag());
+
 
             }
         });

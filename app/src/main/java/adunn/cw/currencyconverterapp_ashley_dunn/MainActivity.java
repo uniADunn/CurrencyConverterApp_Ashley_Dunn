@@ -27,10 +27,10 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.ArrayList;
 import java.util.Collections;
-
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.AcknowledgementFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ConversionFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ErrorFeed;
+import adunn.cw.currencyconverterapp_ashley_dunn.fragments.LoadingFrag;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.RateDetailsFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.RatesFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.SearchFragment;
@@ -43,13 +43,16 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
 {
     private static final int RSS_FEED_DATA_UPDATE = 1;//update message from thread rss feed data
     private static final int RSS_RATES_DATA_UPDATE = 2;//update message from thread rates data
+    private static final int RSS_RATE_PROGRESS_UPDATE = 3; // New message type for progress updates
     private SearchFragment searchFrag; //search fragment
     private RatesFragment ratesFrag; //rates fragment
     private ErrorFeed errorFeedFrag; //error fragment
+    private LoadingFrag loadingFrag;
     private boolean showSearch = false; //flag to show search fragment
     private CurrencyViewModel currencyVM; //currency view model
     private Handler updateUIHandler; //handler for updating UI
     private Toolbar toolbar;
+
     // on create
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,17 +72,14 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         createFragments();
         //create the ui update handler
         createUpdateUIHandler();
-        //update rss data
-        updateRssData();
-        //openFragment(ratesFrag);
-        welcomeDialogCustom();
-
-        if(currencyVM.getRates()!= null) {
+        if(currencyVM.getRates() != null && !currencyVM.getRates().isEmpty()){
             openFragment(ratesFrag);
         }
         else{
-            openFragment(errorFeedFrag);
+
+            updateRssData();
         }
+        welcomeDialogCustom();
 
     }
 
@@ -102,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         }
         invalidateOptionsMenu();
     }
-
     private void welcomeDialogCustom(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View WelcomeDialogView = getLayoutInflater().inflate(R.layout.custom_welcome_dialog, null);
@@ -257,6 +256,9 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             ratesFrag.updateRecView();//updates the view
             invalidateOptionsMenu(); // Invalidate to ensure correct state after filter change
         }
+        else if(item.getItemId() == R.id.action_reload) {
+            updateRssData();
+        }
         else if(item.getItemId() == R.id.action_Aknowledgements){
             showSearch = false;
             closeFragment(searchFrag);
@@ -269,11 +271,12 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         updateToolbar();
         return true;
     }
-    //create fragments, open fragments, open search fragment, close fragment
+    //create fragments, open fragments, open search fragment, close fragments
     private void createFragments(){
         searchFrag = new SearchFragment();
         ratesFrag = new RatesFragment();
         errorFeedFrag = new ErrorFeed();
+        loadingFrag = new LoadingFrag();
     }
 
     public void openFragment(Fragment fragment) {
@@ -281,11 +284,10 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         FragmentTransaction transaction = manager.beginTransaction();
         if(fragment instanceof ErrorFeed){
             transaction.replace(R.id.main_frame_layout, errorFeedFrag);
-            transaction.addToBackStack("ErrorFeed Fragment");
         }
         else if(fragment instanceof RatesFragment){
+            transaction.remove(loadingFrag);
             transaction.replace(R.id.main_frame_layout, ratesFrag);
-            transaction.addToBackStack("Rates Fragment");
         }
         else if(fragment instanceof RateDetailsFragment){
             transaction.replace(R.id.main_frame_layout, new RateDetailsFragment());
@@ -294,6 +296,10 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         else if(fragment instanceof AcknowledgementFragment){
             transaction.replace(R.id.main_frame_layout, fragment);
             transaction.addToBackStack("Acknowledgement Fragment");
+        }
+        else if(fragment instanceof LoadingFrag){
+            transaction.replace(R.id.main_frame_layout, loadingFrag, "LoadingFrag");
+
         }
         transaction.commit();
         invalidateOptionsMenu();
@@ -312,8 +318,14 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             ratesFrag.updateRecView();
             transaction.remove(searchFrag);
         }
+        else if(fragment instanceof LoadingFrag){
+            Fragment existingLoadingFrag = manager.findFragmentByTag("LoadingFrag");
+            if(existingLoadingFrag != null){
+                transaction.remove(existingLoadingFrag);
+            }
+        }
         transaction.commit();
-        invalidateOptionsMenu(); // Invalidate to ensure toolbar is updated after closing search
+        invalidateOptionsMenu();
     }
     //CREATE HANDLER FOR UPDATING UI
     private void createUpdateUIHandler() {
@@ -333,22 +345,27 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                             .show();
                 }
                 //check the message type
+                else if(msg.what == RSS_RATE_PROGRESS_UPDATE){
+                    int progress = msg.arg1;
+                    int max = msg.arg2;
+                    if (loadingFrag != null) {
+                        loadingFrag.setProgressBarMax(max);
+                        loadingFrag.setProgress(progress);
+                    }
+                }
                 else if(msg.what == RSS_RATES_DATA_UPDATE){
                     if(msg.obj instanceof ArrayList){
-                        currencyVM.setRates((ArrayList<CurrencyRate>) msg.obj);
-                        //-----------could do this in the buildRatesList on the View model.--------------
+                        ArrayList<CurrencyRate> ratesFromRss = (ArrayList<CurrencyRate>) msg.obj;
+                        currencyVM.setRates(ratesFromRss);
+
                         ArrayList<Double> values = new ArrayList<>();
-                        for (CurrencyRate r : currencyVM.getRates()) {
-                            r.extractTitle();
-                            r.extractRate();
-                            r.rateConvert();
-                            r.createFlagUrlCode();
+                        for (CurrencyRate r : ratesFromRss) { // Iterate through the rates from RSS
                             values.add(r.getRate());
                         }
                         //--------------------------------------------------------------------------------
                         //colour thresholds
-                        double lowThresh = 0;
-                        double highThresh = 0;
+                        double lowThresh;
+                        double highThresh;
                         if(!values.isEmpty()){
                             Collections.sort(values);
                         }
@@ -363,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                         currencyVM.setHighThreshold(highThresh);
                         //update the rates fragment
                         ratesFrag.updateRecView();
+                        // Replace loading fragment with rates fragment after loading is complete
                         openFragment(ratesFrag);
                         //makes toast to show rates data was updated
                         Toast.makeText(getApplicationContext(),
@@ -376,6 +394,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     }
     //THREAD TO UPDATE RSS DATA
     public void updateRssData() {
+        openFragment(loadingFrag);
         Thread t = new Thread(new RSSCurrency(updateUIHandler));
         t.start();
     }

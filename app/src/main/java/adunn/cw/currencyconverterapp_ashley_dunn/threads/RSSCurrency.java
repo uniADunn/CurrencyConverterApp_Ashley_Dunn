@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 
 import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.*;
 
@@ -23,10 +24,11 @@ public class RSSCurrency implements Runnable{
 
     private final static int RSS_FEED_DATA_UPDATE = 1; //update feed data message
     private final static int RSS_RATES_DATA_UPDATE = 2; //update rates feed data message
+    private final static int RSS_RATE_PROGRESS_UPDATE = 3; //update for progress updates
 
-    private static String urlSource = ""; //url source: https://www.fx-exchange.com/gbp/rss.xml
+    private static String urlSource = "https://www.fx-exchange.com/gbp/rss.xml"; //url source: https://www.fx-exchange.com/gbp/rss.xml
     private String result= "";//result of parsing
-    private Handler rssDataHandler; //handler for updating UI
+    private final Handler rssDataHandler; //handler for updating UI
     private ArrayList<CurrencyRate> rates; //list of currency rates
     //CONSTRUCTOR
     public static void setURLTEST(String url){
@@ -84,114 +86,118 @@ public class RSSCurrency implements Runnable{
             RssFeedData rssFeedData = new RssFeedData();
             CurrencyRate currencyRate = null;
 
+            ArrayList<CurrencyRate> tempRates = new ArrayList<>(); // Temporary list to hold parsed rates
+
+            // First pass to determine total number of items to set max for progress bar
+            XmlPullParser xppForCount = factory.newPullParser();
+            xppForCount.setInput(new StringReader(result));
+            int count = 0;
+            int eventTypeCount = xppForCount.getEventType();
+            while (eventTypeCount != XmlPullParser.END_DOCUMENT) {
+                if (eventTypeCount == XmlPullParser.START_TAG && xppForCount.getName().equalsIgnoreCase("item")) {
+                    count++;
+                }
+                eventTypeCount = xppForCount.next();
+            }
+            final int totalItems = count;
+
+            // Now parse again for data and progress updates
+            xpp.setInput(new StringReader(result)); // Reset parser
+            eventType = xpp.getEventType();
+
             while(eventType != XmlPullParser.END_DOCUMENT){
 
                 if(eventType == XmlPullParser.START_TAG){
-                    //Log.d("Event Type: START_TAG", xpp.getName());
                     if(xpp.getName().equalsIgnoreCase("item")){
                         isItem = true;
                         currencyRate = new CurrencyRate();
                     }
-                    //get rss version (attributes)
-                    if (xpp.getName().equalsIgnoreCase("rss")) {
-                        //Log.d("RSS", "Attribute name: " + xpp.getAttributeName(0) +
-                                //"\nAttribute Value: " + xpp.getAttributeValue(0));
+                    else if (xpp.getName().equalsIgnoreCase("rss")) {
                         rssFeedData.setStrVersionNumber(xpp.getAttributeValue(0));
                     }
-                    //check if title is item or rss feed
                     else if (xpp.getName().equalsIgnoreCase("title")) {
                         text = xpp.nextText();
                         if (!isItem) {
-                            //Log.d("RSSData Title", "text:" + text);
                             rssFeedData.setTitle(text);
-                        } else {
-                            //Log.d("ItemData Title", "text: " + text);
-                            if (currencyRate != null) {
-                                currencyRate.setTitle(text);
-                            }
+                        }
+                        else {
+                            currencyRate.setTitle(text);
                         }
                     }
-                    //check if link is item or rss feed
                     else if (xpp.getName().equalsIgnoreCase("link")) {
                         text = xpp.nextText();
                         if (!isItem) {
-                            //Log.d("RSSData Link", "text: " + text);
                             rssFeedData.setLink(text);
-                        } else {
-                            //Log.d("ItemData Link", "text: " + text);
-                            if (currencyRate != null) {
-                                currencyRate.setLink(text);
-                            }
+                        }
+                        else {
+                            currencyRate.setLink(text);
                         }
                     }
-                    //check if description is item or rss feed
                     else if (xpp.getName().equalsIgnoreCase("description")) {
                         text = xpp.nextText();
                         if (!isItem) {
-                            //Log.d("RSSData Description", "text: " + text);
                             rssFeedData.setDescription(text);
-                        } else {
-                            //Log.d("ItemData Description", "text: " + text);
-                            if (currencyRate != null) {
-                                currencyRate.setDescription(text);
-                            }
+                        }
+                        else {
+                            currencyRate.setDescription(text);
                         }
                     }
-                    //rss feed unique data
                     else if (xpp.getName().equalsIgnoreCase("lastbuilddate")) {
                         text = xpp.nextText();
-                        //Log.d("RSSData LastBuildDate", "text: " + text);
                         rssFeedData.setLastBuildDate(text);
                     } else if (xpp.getName().equalsIgnoreCase("language")) {
                         text = xpp.nextText();
-                        //Log.d("RSSData Language", "text: " + text);
                         rssFeedData.setLanguage(text);
                     } else if (xpp.getName().equalsIgnoreCase("copyright")) {
                         text = xpp.nextText();
-                        //Log.d("RSSData Copyright", "text: " + text);
                         rssFeedData.setCopyright(text);
                     } else if (xpp.getName().equalsIgnoreCase("docs")) {
                         text = xpp.nextText();
-                        //Log.d("RSSData Doc", "text: " + text);
                         rssFeedData.setDoc(text);
                     } else if (xpp.getName().equalsIgnoreCase("ttl")) {
                         text = xpp.nextText();
-                        //Log.d("RSSData TTL", "text: " + text);
                         rssFeedData.setTtl(text);
                     }
-                    //item data unique data
                     else if (xpp.getName().equalsIgnoreCase("guid")) {
                         text = xpp.nextText();
-                        //Log.d("ItemData GUID", "text: " + text);
                         if (currencyRate != null) {
                             currencyRate.setGuid(text);
                         }
                     } else if (xpp.getName().equalsIgnoreCase("pubdate")) {
                         text = xpp.nextText();
-                        //Log.d("ItemData PubDate", "text: " + text);
                         if (currencyRate != null) {
                             currencyRate.setPubDate(text);
                         }
                     } else if (xpp.getName().equalsIgnoreCase("category")) {
                         text = xpp.nextText();
-                        //Log.d("ItemData Category", "text: " + text);
                         if (currencyRate != null) {
                             currencyRate.setCategory(text);
                         }
-
                     }
                 } else if (eventType == XmlPullParser.END_TAG) {
-                    //Log.d("Event type: END_TAG", xpp.getName());
                     if (xpp.getName().equalsIgnoreCase("item")) {
                         isItem = false;
                         if (currencyRate != null) {
-                            rates.add(currencyRate);
+                            currencyRate.extractTitle();
+                            currencyRate.extractRate();
+                            currencyRate.rateConvert();
+                            currencyRate.createFlagUrlCode();
+                            tempRates.add(currencyRate);
+                            // Send progress update
+                            updateUIProgress(RSS_RATE_PROGRESS_UPDATE, tempRates.size(), totalItems);
+                            try {
+                                Thread.sleep(25);
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            }
                         }
                     }
                 }
-
                 eventType = xpp.next();
             }//end of while
+            rates.addAll(tempRates);
+            rssFeedData.setItems(rates);
+
             updateUI(RSS_FEED_DATA_UPDATE, rssFeedData);
             updateUI(RSS_RATES_DATA_UPDATE, rates);
         }
@@ -210,7 +216,14 @@ public class RSSCurrency implements Runnable{
         msg.what = update;
         msg.obj = updateData;
         rssDataHandler.sendMessage(msg);
-
     }
 
+    // New method for sending progress updates
+    private void updateUIProgress(int what, int progress, int max) {
+        Message msg = new Message();
+        msg.what = what;
+        msg.arg1 = progress; // current progress
+        msg.arg2 = max;      // max value for the progress bar
+        rssDataHandler.sendMessage(msg);
+    }
 }
