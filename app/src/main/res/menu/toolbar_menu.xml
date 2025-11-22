@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_search"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/search_icon"
         android:title="search"
         />
@@ -11,12 +11,20 @@
         android:id="@+id/action_filterToggle"
         app:showAsAction="always"
         android:title="Common Rates"
-
         />
+
     <item
         android:title="Settings">
         <menu>
 
+
         </menu>
     </item>
+    <item
+        android:id="@+id/action_Aknowledgements"
+        android:title="Aknowledgements">
+    </item>
+    <item
+        android:id="@+id/action_exit"
+        android:title="Exit"/>
 </menu>

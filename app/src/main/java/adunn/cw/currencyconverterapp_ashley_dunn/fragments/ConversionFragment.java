@@ -18,7 +18,9 @@ public class ConversionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         currencyVM = new ViewModelProvider(requireActivity()).get(CurrencyViewModel.class);
         View v = inflater.inflate(R.layout.conversion_layout, container, false);
+
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+
         transaction.replace(R.id.input_control_container, new InputControlFragment());
         transaction.replace(R.id.rate_details_container, new RateDetailsFragment());
         transaction.commit();

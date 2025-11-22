@@ -28,7 +28,10 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import adunn.cw.currencyconverterapp_ashley_dunn.fragments.AcknowledgementFragment;
+import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ConversionFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ErrorFeed;
+import adunn.cw.currencyconverterapp_ashley_dunn.fragments.RateDetailsFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.RatesFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.SearchFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     private boolean showSearch = false; //flag to show search fragment
     private CurrencyViewModel currencyVM; //currency view model
     private Handler updateUIHandler; //handler for updating UI
+    private Toolbar toolbar;
     // on create
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +73,36 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         updateRssData();
         //openFragment(ratesFrag);
         welcomeDialogCustom();
-        openFragment();
-        //refresh data
+
+        if(currencyVM.getRates()!= null) {
+            openFragment(ratesFrag);
+        }
+        else{
+            openFragment(errorFeedFrag);
+        }
+
     }
+
+    private void updateToolbar() {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+        if (toolbar != null) {
+            MenuItem search = toolbar.getMenu().findItem(R.id.action_search);
+            MenuItem filter = toolbar.getMenu().findItem(R.id.action_filterToggle);
+            if (currentFragment instanceof AcknowledgementFragment) {
+                toolbar.setTitle("Acknowledgements");
+                search.setVisible(false);
+                filter.setVisible(false);
+            } else if (currentFragment instanceof ConversionFragment) {
+                toolbar.setTitle("Conversion");
+                search.setVisible(false);
+                filter.setVisible(false);
+            } else { // RatesFragment, ErrorFeed, or other default fragments
+                toolbar.setTitle(R.string.app_name); // Set to your default app name
+            }
+        }
+        invalidateOptionsMenu();
+    }
+
     private void welcomeDialogCustom(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View WelcomeDialogView = getLayoutInflater().inflate(R.layout.custom_welcome_dialog, null);
@@ -99,32 +130,97 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         });
         dialog.show();
     }
-    private void setToolbar(){
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    private void confirmExitDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View exitDialogView = getLayoutInflater().inflate(R.layout.exit_dialog_layout, null);
+        builder.setView(exitDialogView);
+        builder.setTitle("Exit Application");
 
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener(){
+            @Override
+            public void onShow(DialogInterface d) {
+                AlertDialog dialog = (AlertDialog) d;
+                Button yesBtn = dialog.findViewById(R.id.yes_btn);
+                yesBtn.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        Toast.makeText(getApplicationContext(),
+                                "Exiting Application",
+                                Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+                Button noBtn = dialog.findViewById(R.id.no_btn);
+                noBtn.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        Toast.makeText(getApplicationContext(),
+                                "Exit Cancelled",
+                                Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+        dialog.show();
+    }
+    //set toolbar
+    private void setToolbar(){
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar_menu, menu);
 
-        if(currencyVM.isFiltered()){
-            menu.findItem(R.id.action_filterToggle).setTitle("All Rates");
-            menu.findItem(R.id.action_search).setVisible(false).setEnabled(false);
+        MenuItem searchIcon = menu.findItem(R.id.action_search);
+        MenuItem filterToggle = menu.findItem(R.id.action_filterToggle);
+        //get the current fragment in main frame
+        Fragment currentFrag = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+
+        if(currentFrag instanceof RatesFragment){
+            //check if filter is on or off
+            if(currencyVM.isFiltered()){
+                //filter is on
+                filterToggle.setTitle("All Rates");
+                searchIcon.setVisible(false).setEnabled(false);
+            }
+            else{
+                //filter is off
+                filterToggle.setTitle("Common Rates");
+                searchIcon.setVisible(true).setEnabled(true);
+            }
+            if(toolbar != null) {
+                if(currencyVM.isFiltered()){
+                    toolbar.setTitle("Common Rates");
+                } else {
+                    toolbar.setTitle("All Rates");
+                }
+            }
+        } else if(currentFrag instanceof AcknowledgementFragment || currentFrag instanceof ConversionFragment){
+            //hide toolbar search and filter toggle
+            searchIcon.setVisible(false).setEnabled(false);
+            filterToggle.setVisible(false).setEnabled(false);
         }
         else{
-            menu.findItem(R.id.action_filterToggle).setTitle("Common Rates");
-            menu.findItem(R.id.action_search).setVisible(true).setEnabled(true);
+
+            filterToggle.setTitle("Common Rates"); // Default to common rates if no specific fragment logic
+            searchIcon.setVisible(true).setEnabled(true);
+            if(toolbar != null) {
+                toolbar.setTitle(R.string.app_name); // Default title
+            }
         }
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Currency Rates");
+        updateToolbar();
         return true;
     }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
+        MenuItem search = toolbar.getMenu().findItem(R.id.action_search);
+        MenuItem filter = toolbar.getMenu().findItem(R.id.action_filterToggle);
         //check which item was selected
-        if (item.getItemId() == R.id.action_search) {//search item
+        if (item.getItemId() == search.getItemId()) {//search item
             showSearch = !showSearch; //flip flag
             if(showSearch){//if flag is true
                 if(!currencyVM.isFiltered()) {//check if filter toggle not filtering for common
@@ -140,47 +236,67 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                 closeFragment(searchFrag);
             }
         }
-        if(item.getItemId() == R.id.action_filterToggle){//filter rates toggle
-            Toolbar toolbar = findViewById(R.id.toolbar);
-            MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
-
+        else if(item.getItemId() == filter.getItemId()){//filter rates toggle
             boolean isFiltered = currencyVM.isFiltered();//get current filter state
             isFiltered = !isFiltered;//flip state
             currencyVM.setFiltered(isFiltered);//set the state in the viewmodel
-
+            //check the state of filter
             if (isFiltered) {//filter is on
                 item.setTitle("All Rates");
-                searchItem.setVisible(false).setEnabled(false);
+                toolbar.setTitle("Common Rates");
+                //hide search icon
+                search.setVisible(false).setEnabled(false);
+                closeFragment(searchFrag);//closes search fragment
+                showSearch = false;//sets state
             } else {//filter is off
                 item.setTitle("Common Rates");
-                searchItem.setVisible(true).setEnabled(true);
+                toolbar.setTitle("All Rates");
+                //show search icon
+                search.setVisible(true).setEnabled(true);
             }
-
-            closeFragment(searchFrag);//closes search fragment
-            showSearch = false;//sets state
             ratesFrag.updateRecView();//updates the view
+            invalidateOptionsMenu(); // Invalidate to ensure correct state after filter change
         }
-        ratesFrag.updateRecView();
+        else if(item.getItemId() == R.id.action_Aknowledgements){
+            showSearch = false;
+            closeFragment(searchFrag);
+            openFragment(new AcknowledgementFragment());
+            // Title and menu visibility handled by onBackStackChanged and onCreateOptionsMenu
+        }
+        else if(item.getItemId() == R.id.action_exit){
+            confirmExitDialog();
+        }
+        updateToolbar();
         return true;
     }
+    //create fragments, open fragments, open search fragment, close fragment
     private void createFragments(){
         searchFrag = new SearchFragment();
         ratesFrag = new RatesFragment();
         errorFeedFrag = new ErrorFeed();
     }
-    public void openFragment() {
+
+    public void openFragment(Fragment fragment) {
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        if (currencyVM.getRates() == null || currencyVM.getRates().isEmpty()) {
-            Log.d("MainActivity", "Displaying error feed fragment.");
+        if(fragment instanceof ErrorFeed){
             transaction.replace(R.id.main_frame_layout, errorFeedFrag);
+            transaction.addToBackStack("ErrorFeed Fragment");
         }
-        else {
-            Log.d("MainActivity", "Displaying rates fragment.");
-            ratesFrag.updateRecView();
+        else if(fragment instanceof RatesFragment){
             transaction.replace(R.id.main_frame_layout, ratesFrag);
+            transaction.addToBackStack("Rates Fragment");
+        }
+        else if(fragment instanceof RateDetailsFragment){
+            transaction.replace(R.id.main_frame_layout, new RateDetailsFragment());
+            transaction.addToBackStack("Rate Details Fragment");
+        }
+        else if(fragment instanceof AcknowledgementFragment){
+            transaction.replace(R.id.main_frame_layout, fragment);
+            transaction.addToBackStack("Acknowledgement Fragment");
         }
         transaction.commit();
+        invalidateOptionsMenu();
     }
     private void openSearchFragment(){
         FragmentManager manager = getSupportFragmentManager();
@@ -197,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             transaction.remove(searchFrag);
         }
         transaction.commit();
+        invalidateOptionsMenu(); // Invalidate to ensure toolbar is updated after closing search
     }
     //CREATE HANDLER FOR UPDATING UI
     private void createUpdateUIHandler() {
@@ -246,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                         currencyVM.setHighThreshold(highThresh);
                         //update the rates fragment
                         ratesFrag.updateRecView();
-                        openFragment();
+                        openFragment(ratesFrag);
                         //makes toast to show rates data was updated
                         Toast.makeText(getApplicationContext(),
                                         "Rates Updated",
@@ -262,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         Thread t = new Thread(new RSSCurrency(updateUIHandler));
         t.start();
     }
+    //listener for on search
     @Override
     public void onSearch(String query){
         currencyVM.setInputSearchLive(query);
