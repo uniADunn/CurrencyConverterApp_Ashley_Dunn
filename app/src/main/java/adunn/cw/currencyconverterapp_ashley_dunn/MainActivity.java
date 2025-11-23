@@ -41,17 +41,17 @@ import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class MainActivity extends AppCompatActivity implements SearchFragment.OnSearchListener
 {
-    private static final int RSS_FEED_DATA_UPDATE = 1;//update message from thread rss feed data
-    private static final int RSS_RATES_DATA_UPDATE = 2;//update message from thread rates data
-    private static final int RSS_RATE_PROGRESS_UPDATE = 3; // New message type for progress updates
+    private static final int RSS_FEED_DATA_UPDATE = 1;//update message for thread rss feed data
+    private static final int RSS_RATES_DATA_UPDATE = 2;//update message for thread rates data
+    private static final int RSS_RATE_PROGRESS_UPDATE = 3;//update message for progress updates
     private SearchFragment searchFrag; //search fragment
     private RatesFragment ratesFrag; //rates fragment
     private ErrorFeed errorFeedFrag; //error fragment
-    private LoadingFrag loadingFrag;
+    private LoadingFrag loadingFrag; //loading fragment
     private boolean showSearch = false; //flag to show search fragment
     private CurrencyViewModel currencyVM; //currency view model
     private Handler updateUIHandler; //handler for updating UI
-    private Toolbar toolbar;
+    private Toolbar toolbar; //toolbar menu
 
     // on create
     @Override
@@ -72,88 +72,96 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         createFragments();
         //create the ui update handler
         createUpdateUIHandler();
+    }
+    @Override
+    public void onStart(){
+        super.onStart();
         if(currencyVM.getRates() != null && !currencyVM.getRates().isEmpty()){
             openFragment(ratesFrag);
         }
         else{
-
+            updateRssData();
+            welcomeDialogCustom();
+        }
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+        if(currencyVM.getRates() != null && !currencyVM.getRates().isEmpty()){
+            openFragment(ratesFrag);
+        }
+        else{
             updateRssData();
         }
-        welcomeDialogCustom();
-
     }
 
-    private void updateToolbar() {
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-        if (toolbar != null) {
-            MenuItem search = toolbar.getMenu().findItem(R.id.action_search);
-            MenuItem filter = toolbar.getMenu().findItem(R.id.action_filterToggle);
-            if (currentFragment instanceof AcknowledgementFragment) {
-                toolbar.setTitle("Acknowledgements");
-                search.setVisible(false);
-                filter.setVisible(false);
-            } else if (currentFragment instanceof ConversionFragment) {
-                toolbar.setTitle("Conversion");
-                search.setVisible(false);
-                filter.setVisible(false);
-            } else { // RatesFragment, ErrorFeed, or other default fragments
-                toolbar.setTitle(R.string.app_name); // Set to your default app name
-            }
-        }
-        invalidateOptionsMenu();
-    }
+
+    //welcome dialog
     private void welcomeDialogCustom(){
+        //create dialog builder and inflate custom welcome dialog layout into view
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View WelcomeDialogView = getLayoutInflater().inflate(R.layout.custom_welcome_dialog, null);
         builder.setView(WelcomeDialogView);
+        //set title
         builder.setTitle(R.string.string_welcome_dialog_title);
-
+        //create the dialog and set onShow listener
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(new DialogInterface.OnShowListener(){
             @Override
             public void onShow(DialogInterface d){
+                //get the dialog object
                 AlertDialog dialog = (AlertDialog) d;
-
+                //get the text view and set the text
                 TextView customDialogText = dialog.findViewById(R.id.customDialogText);
                 customDialogText.setText(R.string.string_welcome_dialog_text);
-
-                Button dialogBtn = dialog.findViewById(R.id.customDialogButton);
-                dialogBtn.setText(R.string.string_string_custom_dialog_button_text);
-                dialogBtn.setOnClickListener(new View.OnClickListener() {
+                //get the button and set the text and onClick listener
+                Button OKBtn = dialog.findViewById(R.id.customDialogButton);
+                OKBtn.setText(R.string.string_string_custom_dialog_button_text);
+                OKBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //ok button dismisses dialog
                         dialog.dismiss();
                     }
                 });
             }
         });
+        //show the dialog
         dialog.show();
     }
+    //exit dialog
     private void confirmExitDialog(){
+        //create dialog builder and  inflate custom exit dialog layout into view
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View exitDialogView = getLayoutInflater().inflate(R.layout.exit_dialog_layout, null);
         builder.setView(exitDialogView);
+        //set title
         builder.setTitle("Exit Application");
-
+        //create the dialog and set onShow listener
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(new DialogInterface.OnShowListener(){
             @Override
             public void onShow(DialogInterface d) {
+                //get the dialog object
                 AlertDialog dialog = (AlertDialog) d;
+                //get yes button and set onClickListener
                 Button yesBtn = dialog.findViewById(R.id.yes_btn);
                 yesBtn.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
+                        //yes button: shows toast and closes application
                         Toast.makeText(getApplicationContext(),
                                 "Exiting Application",
                                 Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 });
+                //get no button and set onClick listener
                 Button noBtn = dialog.findViewById(R.id.no_btn);
                 noBtn.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
+                        //no button: shows toast and dismisses dialog
                         Toast.makeText(getApplicationContext(),
                                 "Exit Cancelled",
                                 Toast.LENGTH_SHORT).show();
@@ -162,35 +170,68 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                 });
             }
         });
+        //show dialog
         dialog.show();
     }
     //set toolbar
     private void setToolbar(){
+        //set toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
+    private void updateToolbar() {
+        //get the current fragment
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+        //check toolbar is not null
+        if (toolbar != null) {
+            //get menu items search and filter
+            MenuItem search = toolbar.getMenu().findItem(R.id.action_search);
+            MenuItem filter = toolbar.getMenu().findItem(R.id.action_filterToggle);
+
+            //check the current instance of the fragments
+            if (currentFragment instanceof AcknowledgementFragment) {
+                //fragment is an acknowledgement fragment
+                toolbar.setTitle("Acknowledgements");//set title
+                search.setVisible(false);//hide search
+                filter.setVisible(false);//hide filter
+            } else if (currentFragment instanceof ConversionFragment) {
+                //fragment is conversion fragment
+                toolbar.setTitle("Conversion");//set title
+                search.setVisible(false);//hide search
+                filter.setVisible(false);//hide filter
+            } else {
+                //fragment is not an acknowledgement or conversion fragment
+                toolbar.setTitle(R.string.app_name); //set default app name
+            }
+        }
+        //triggers the toolbar to update
+        invalidateOptionsMenu();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
+        //inflate menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar_menu, menu);
-
+        //get the menu items
         MenuItem searchIcon = menu.findItem(R.id.action_search);
         MenuItem filterToggle = menu.findItem(R.id.action_filterToggle);
         //get the current fragment in main frame
         Fragment currentFrag = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
-
+        //check current fragment instance
         if(currentFrag instanceof RatesFragment){
+            //current fragment is RatesFragment
             //check if filter is on or off
             if(currencyVM.isFiltered()){
                 //filter is on
-                filterToggle.setTitle("All Rates");
-                searchIcon.setVisible(false).setEnabled(false);
+                filterToggle.setTitle("All Rates");//set filter toggle title
+                searchIcon.setVisible(false).setEnabled(false);//hide search
             }
             else{
                 //filter is off
-                filterToggle.setTitle("Common Rates");
-                searchIcon.setVisible(true).setEnabled(true);
+                filterToggle.setTitle("Common Rates");//set filter toggle title
+                searchIcon.setVisible(true).setEnabled(true);//show search
             }
+            //update toolbar toggle filter title
             if(toolbar != null) {
                 if(currencyVM.isFiltered()){
                     toolbar.setTitle("Common Rates");
@@ -199,38 +240,35 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                 }
             }
         } else if(currentFrag instanceof AcknowledgementFragment || currentFrag instanceof ConversionFragment){
-            //hide toolbar search and filter toggle
+            //fragment is either acknowledgement or conversion fragment, both should hide search and filter
             searchIcon.setVisible(false).setEnabled(false);
             filterToggle.setVisible(false).setEnabled(false);
         }
-        else{
-
-            filterToggle.setTitle("Common Rates"); // Default to common rates if no specific fragment logic
-            searchIcon.setVisible(true).setEnabled(true);
-            if(toolbar != null) {
-                toolbar.setTitle(R.string.app_name); // Default title
-            }
-        }
+        //update toolbar
         updateToolbar();
         return true;
     }
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item){
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //get the menu items
         MenuItem search = toolbar.getMenu().findItem(R.id.action_search);
         MenuItem filter = toolbar.getMenu().findItem(R.id.action_filterToggle);
+        MenuItem reload = toolbar.getMenu().findItem(R.id.action_reload);
+        MenuItem acknowledgements = toolbar.getMenu().findItem(R.id.action_acknowledgements);
+        MenuItem exit = toolbar.getMenu().findItem(R.id.action_exit);
         //check which item was selected
         if (item.getItemId() == search.getItemId()) {//search item
             showSearch = !showSearch; //flip flag
-            if(showSearch){//if flag is true
-                if(!currencyVM.isFiltered()) {//check if filter toggle not filtering for common
+            if (showSearch){
+                //if flag is true check if filter is on or off
+                if (!currencyVM.isFiltered()) {
+                    //flag is false, not showing filtered list, open search fragment
                     openSearchFragment();
-                }
-                else{
+                } else {
                     //list is filtered close the search fragment
                     closeFragment(searchFrag);
                 }
-            }
-            else{
+            } else {
                 //show search is flipped to false, close the search fragment
                 closeFragment(searchFrag);
             }
@@ -240,48 +278,54 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             isFiltered = !isFiltered;//flip state
             currencyVM.setFiltered(isFiltered);//set the state in the viewmodel
             //check the state of filter
-            if (isFiltered) {//filter is on
-                item.setTitle("All Rates");
-                toolbar.setTitle("Common Rates");
+            if (isFiltered) {
+                //filter is on
+                item.setTitle("All Rates");//set title
+                toolbar.setTitle("Common Rates");//set toolbar title
                 //hide search icon
                 search.setVisible(false).setEnabled(false);
                 closeFragment(searchFrag);//closes search fragment
                 showSearch = false;//sets state
             } else {//filter is off
-                item.setTitle("Common Rates");
-                toolbar.setTitle("All Rates");
+                item.setTitle("Common Rates");//set title
+                toolbar.setTitle("All Rates");//set toolbar title
                 //show search icon
                 search.setVisible(true).setEnabled(true);
             }
-            ratesFrag.updateRecView();//updates the view
-            invalidateOptionsMenu(); // Invalidate to ensure correct state after filter change
+            //update the rates fragment
+            ratesFrag.updateRecView();
+            //update toolbar
+            invalidateOptionsMenu();
         }
-        else if(item.getItemId() == R.id.action_reload) {
+        else if(item.getItemId() == reload.getItemId()) {
             updateRssData();
         }
-        else if(item.getItemId() == R.id.action_Aknowledgements){
-            showSearch = false;
-            closeFragment(searchFrag);
+        else if(item.getItemId() == acknowledgements.getItemId()){
+            showSearch = false;//set flag state
+            closeFragment(searchFrag);//close search fragment
+            //open acknowledgement fragment
             openFragment(new AcknowledgementFragment());
-            // Title and menu visibility handled by onBackStackChanged and onCreateOptionsMenu
         }
-        else if(item.getItemId() == R.id.action_exit){
+        else if(item.getItemId() == exit.getItemId()){
+            //get exit dialog
             confirmExitDialog();
         }
+        //update toolbar
         updateToolbar();
         return true;
     }
-    //create fragments, open fragments, open search fragment, close fragments
+    //fragments create, open, close
     private void createFragments(){
         searchFrag = new SearchFragment();
         ratesFrag = new RatesFragment();
         errorFeedFrag = new ErrorFeed();
         loadingFrag = new LoadingFrag();
     }
-
     public void openFragment(Fragment fragment) {
+        //get the fragment manager and transaction
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
+        //check which fragment to open
         if(fragment instanceof ErrorFeed){
             transaction.replace(R.id.main_frame_layout, errorFeedFrag);
         }
@@ -299,36 +343,47 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         }
         else if(fragment instanceof LoadingFrag){
             transaction.replace(R.id.main_frame_layout, loadingFrag, "LoadingFrag");
-
         }
+        //commit the transaction
         transaction.commit();
+        //update the toolbar
         invalidateOptionsMenu();
     }
     private void openSearchFragment(){
+        //get the fragment manager and transaction
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
+        //replace the search fragment
         transaction.replace(R.id.searchFragment_container, searchFrag);
+        //commit the transaction
         transaction.commit();
     }
     private void closeFragment(Fragment fragment){
+        //get the fragment manager and transaction
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
+        //check which fragment to close
         if(fragment instanceof SearchFragment){
-            currencyVM.setInputSearchLive("");
-            ratesFrag.updateRecView();
-            transaction.remove(searchFrag);
+            //fragment is search fragment
+            currencyVM.setInputSearchLive("");//set input to empty
+            ratesFrag.updateRecView();//update the rates fragment
+            transaction.remove(searchFrag);//remove the search fragment
         }
         else if(fragment instanceof LoadingFrag){
+            //fragment is loading fragment
             Fragment existingLoadingFrag = manager.findFragmentByTag("LoadingFrag");
             if(existingLoadingFrag != null){
                 transaction.remove(existingLoadingFrag);
             }
         }
+        //commit transaction
         transaction.commit();
+        //trigger toolbar update
         invalidateOptionsMenu();
     }
     //CREATE HANDLER FOR UPDATING UI
     private void createUpdateUIHandler() {
+        //create handler
         updateUIHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -337,7 +392,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     //set view model data
                     currencyVM.setRssFeedData((RssFeedData) msg.obj);
                     currencyVM.setLastPublished(currencyVM.getRssFeedData().getLastBuildDate());
-
                     //makes toast to show data was updated.
                     Toast.makeText(getApplicationContext(),
                                     "RSS Data Updated",
@@ -346,6 +400,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                 }
                 //check the message type
                 else if(msg.what == RSS_RATE_PROGRESS_UPDATE){
+                    //updates the progress bar
                     int progress = msg.arg1;
                     int max = msg.arg2;
                     if (loadingFrag != null) {
@@ -357,12 +412,11 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     if(msg.obj instanceof ArrayList){
                         ArrayList<CurrencyRate> ratesFromRss = (ArrayList<CurrencyRate>) msg.obj;
                         currencyVM.setRates(ratesFromRss);
-
+                        //get the rates from each Currency rate
                         ArrayList<Double> values = new ArrayList<>();
-                        for (CurrencyRate r : ratesFromRss) { // Iterate through the rates from RSS
+                        for (CurrencyRate r : ratesFromRss) {
                             values.add(r.getRate());
                         }
-                        //--------------------------------------------------------------------------------
                         //colour thresholds
                         double lowThresh;
                         double highThresh;
@@ -394,8 +448,11 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     }
     //THREAD TO UPDATE RSS DATA
     public void updateRssData() {
+        //open loading fragment
         openFragment(loadingFrag);
+        //create thread
         Thread t = new Thread(new RSSCurrency(updateUIHandler));
+        //start thread
         t.start();
     }
     //listener for on search

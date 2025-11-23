@@ -86,9 +86,9 @@ public class RSSCurrency implements Runnable{
             RssFeedData rssFeedData = new RssFeedData();
             CurrencyRate currencyRate = null;
 
-            ArrayList<CurrencyRate> tempRates = new ArrayList<>(); // Temporary list to hold parsed rates
+            ArrayList<CurrencyRate> tempRates = new ArrayList<>(); // list to hold parsed rates
 
-            // First pass to determine total number of items to set max for progress bar
+            //parse to get total number of items, by counting the amount of start tags that start with item
             XmlPullParser xppForCount = factory.newPullParser();
             xppForCount.setInput(new StringReader(result));
             int count = 0;
@@ -99,10 +99,10 @@ public class RSSCurrency implements Runnable{
                 }
                 eventTypeCount = xppForCount.next();
             }
-            final int totalItems = count;
+            final int totalItems = count;//total amount of items, for setting progress bar max value
 
-            // Now parse again for data and progress updates
-            xpp.setInput(new StringReader(result)); // Reset parser
+            //parse to get rates and rss feed data
+            xpp.setInput(new StringReader(result));
             eventType = xpp.getEventType();
 
             while(eventType != XmlPullParser.END_DOCUMENT){
@@ -186,7 +186,7 @@ public class RSSCurrency implements Runnable{
                             // Send progress update
                             updateUIProgress(RSS_RATE_PROGRESS_UPDATE, tempRates.size(), totalItems);
                             try {
-                                Thread.sleep(25);
+                                Thread.sleep(50);
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
                             }

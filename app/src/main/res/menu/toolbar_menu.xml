@@ -16,7 +16,7 @@
         android:id="@+id/action_reload"
         android:title="Reload Data"/>
     <item
-        android:id="@+id/action_Aknowledgements"
+        android:id="@+id/action_acknowledgements"
         android:title="Acknowledgements">
     </item>
     <item
