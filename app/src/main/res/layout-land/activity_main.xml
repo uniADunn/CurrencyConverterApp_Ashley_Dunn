@@ -24,13 +24,10 @@
         android:id="@+id/searchFragment_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/main_frame2_layout"
         />
-
-
     <FrameLayout
         android:id="@+id/main_frame_layout"
         android:layout_width="0dp"

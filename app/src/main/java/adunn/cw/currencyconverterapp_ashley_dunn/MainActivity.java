@@ -67,8 +67,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-
         //create view model
         currencyVM = new ViewModelProvider(this).get(CurrencyViewModel.class);
         isHorizontal = findViewById(R.id.main_frame2_layout) != null;
@@ -335,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         FragmentTransaction transaction = manager.beginTransaction();
 
         if (isHorizontal) {
+            //landscape mode
             Log.d("Phone Landscape Mode", "In landscape mode");
             // In landscape mode
             if (fragment instanceof ConversionFragment) {
@@ -354,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                 transaction.addToBackStack(fragment.getClass().getSimpleName());
             }
         } else {
-            // In portrait mode, all fragments replace main_frame_layout
+            //portrait mode
             if(fragment instanceof ErrorFeed){
                 transaction.replace(R.id.main_frame_layout, errorFeedFrag);
             }
