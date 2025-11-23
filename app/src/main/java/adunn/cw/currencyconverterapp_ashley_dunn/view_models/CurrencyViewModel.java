@@ -8,6 +8,7 @@ import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.RssFeedData;
 
 public class CurrencyViewModel extends ViewModel {
+    private boolean isHorizontal;
     private double lowThreshold;
     private double highThreshold;
     private RssFeedData rssData;
@@ -58,6 +59,12 @@ public class CurrencyViewModel extends ViewModel {
             return c1.compareTo(c2);
         });
         return rates;
+    }
+    public void setHorizontal(boolean isHorizontal){
+        this.isHorizontal = isHorizontal;
+    }
+    public boolean isHorizontal(){
+        return isHorizontal;
     }
     public void setLowThreshold(double low){
         this.lowThreshold = low;

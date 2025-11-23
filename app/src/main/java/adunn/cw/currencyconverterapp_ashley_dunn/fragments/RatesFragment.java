@@ -1,6 +1,7 @@
 package adunn.cw.currencyconverterapp_ashley_dunn.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,9 +62,16 @@ public class RatesFragment extends Fragment implements RecViewAdapter.OnRateClic
             MenuItem item2 = menu.findItem(R.id.action_filterToggle);
             item2.setVisible(false);
         }
-        transaction.replace(R.id.main_frame_layout, new ConversionFragment());
-        transaction.replace(R.id.searchFragment_container, new Fragment());
-        transaction.addToBackStack(null);
+        if(currencyVM.isHorizontal()){
+            Log.d("onRateClick", "in landscape mode");
+            transaction.replace(R.id.main_frame2_layout, new ConversionFragment());
+        }
+        else{
+            Log.d("onRateClick", "in portrait mode");
+            transaction.replace(R.id.main_frame_layout, new ConversionFragment());
+            transaction.replace(R.id.searchFragment_container, new Fragment());
+            transaction.addToBackStack(null);
+        }
         transaction.commit();
         rcRates.setAdapter(rcAdapter);
     }

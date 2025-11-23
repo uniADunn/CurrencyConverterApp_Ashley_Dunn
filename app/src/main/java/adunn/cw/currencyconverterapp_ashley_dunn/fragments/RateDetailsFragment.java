@@ -38,9 +38,13 @@ public class RateDetailsFragment extends Fragment {
     }
     private void addFlagImage(){
         CurrencyRate rate = currencyVM.getRateSelected().getValue();
-        if(rate.getFlagUrl() != null){
+        if((rate != null ? rate.getFlagUrl() : null) != null){
             Glide.with(this.flagImage)
                     .load(rate.getFlagUrl())
+                    .into(flagImage);
+        }else{
+            Glide.with(this.flagImage)
+                    .load(R.drawable.ic_launcher_background)
                     .into(flagImage);
         }
     }

@@ -186,7 +186,7 @@ public class RSSCurrency implements Runnable{
                             // Send progress update
                             updateUIProgress(RSS_RATE_PROGRESS_UPDATE, tempRates.size(), totalItems);
                             try {
-                                Thread.sleep(50);
+                                Thread.sleep(15);
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
                             }

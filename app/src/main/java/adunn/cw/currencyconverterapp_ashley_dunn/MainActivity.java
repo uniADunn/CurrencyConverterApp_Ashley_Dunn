@@ -27,6 +27,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import adunn.cw.currencyconverterapp_ashley_dunn.adapters.RecViewAdapter;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.AcknowledgementFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ConversionFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ErrorFeed;
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     private CurrencyViewModel currencyVM; //currency view model
     private Handler updateUIHandler; //handler for updating UI
     private Toolbar toolbar; //toolbar menu
+    private boolean isHorizontal; //flag if in landscape mode
 
     // on create
     @Override
@@ -64,8 +67,12 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
         //create view model
         currencyVM = new ViewModelProvider(this).get(CurrencyViewModel.class);
+        isHorizontal = findViewById(R.id.main_frame2_layout) != null;
+        currencyVM.setHorizontal(findViewById(R.id.main_frame2_layout)!= null);
         //set toolbar
         setToolbar();
         //create fragments
@@ -268,7 +275,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     //list is filtered close the search fragment
                     closeFragment(searchFrag);
                 }
-            } else {
+            }
+            else {
                 //show search is flipped to false, close the search fragment
                 closeFragment(searchFrag);
             }
@@ -286,7 +294,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                 search.setVisible(false).setEnabled(false);
                 closeFragment(searchFrag);//closes search fragment
                 showSearch = false;//sets state
-            } else {//filter is off
+            }
+            else {//filter is off
                 item.setTitle("Common Rates");//set title
                 toolbar.setTitle("All Rates");//set toolbar title
                 //show search icon
@@ -322,28 +331,54 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         loadingFrag = new LoadingFrag();
     }
     public void openFragment(Fragment fragment) {
-        //get the fragment manager and transaction
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        //check which fragment to open
-        if(fragment instanceof ErrorFeed){
-            transaction.replace(R.id.main_frame_layout, errorFeedFrag);
+
+        if (isHorizontal) {
+            Log.d("Phone Landscape Mode", "In landscape mode");
+            // In landscape mode
+            if (fragment instanceof ConversionFragment) {
+                //right side
+                Log.d("conversion fragment", "conversion fragment into main frame 2 layout");
+                transaction.replace(R.id.main_frame2_layout, fragment);
+            } else if (fragment instanceof RatesFragment) {
+                //left side
+                Log.d("rates fragment", "rates fragment into main frame layout");
+                transaction.replace(R.id.main_frame_layout, ratesFrag);
+            } else if (fragment instanceof AcknowledgementFragment || fragment instanceof ErrorFeed || fragment instanceof LoadingFrag) {
+                Fragment currentRightFragment = manager.findFragmentById(R.id.main_frame2_layout);
+                if (currentRightFragment != null) {
+                    transaction.remove(currentRightFragment);
+                }
+                transaction.replace(R.id.main_frame_layout, fragment);
+                transaction.addToBackStack(fragment.getClass().getSimpleName());
+            }
+        } else {
+            // In portrait mode, all fragments replace main_frame_layout
+            if(fragment instanceof ErrorFeed){
+                transaction.replace(R.id.main_frame_layout, errorFeedFrag);
+            }
+            else if(fragment instanceof RatesFragment){
+                transaction.remove(loadingFrag);
+                transaction.replace(R.id.main_frame_layout, ratesFrag);
+            }
+            else if(fragment instanceof RateDetailsFragment){
+                transaction.replace(R.id.main_frame_layout, fragment);
+                transaction.addToBackStack("Rate Details Fragment");
+            }
+            else if(fragment instanceof ConversionFragment){
+                transaction.replace(R.id.main_frame_layout, fragment);
+                transaction.addToBackStack("Conversion Fragment");
+            }
+            else if(fragment instanceof AcknowledgementFragment){
+                transaction.replace(R.id.main_frame_layout, fragment);
+                transaction.addToBackStack("Acknowledgement Fragment");
+            }
+            else if(fragment instanceof LoadingFrag){
+                transaction.replace(R.id.main_frame_layout, loadingFrag, "LoadingFrag");
+            }
         }
-        else if(fragment instanceof RatesFragment){
-            transaction.remove(loadingFrag);
-            transaction.replace(R.id.main_frame_layout, ratesFrag);
-        }
-        else if(fragment instanceof RateDetailsFragment){
-            transaction.replace(R.id.main_frame_layout, new RateDetailsFragment());
-            transaction.addToBackStack("Rate Details Fragment");
-        }
-        else if(fragment instanceof AcknowledgementFragment){
-            transaction.replace(R.id.main_frame_layout, fragment);
-            transaction.addToBackStack("Acknowledgement Fragment");
-        }
-        else if(fragment instanceof LoadingFrag){
-            transaction.replace(R.id.main_frame_layout, loadingFrag, "LoadingFrag");
-        }
+
         //commit the transaction
         transaction.commit();
         //update the toolbar
