@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     private static final int RSS_FEED_DATA_UPDATE = 1;//update message for thread rss feed data
     private static final int RSS_RATES_DATA_UPDATE = 2;//update message for thread rates data
     private static final int RSS_RATE_PROGRESS_UPDATE = 3;//update message for progress updates
+    private static final int ERROR_FEED_DATA = 4; //update message for error feed data
     private SearchFragment searchFrag; //search fragment
     private RatesFragment ratesFrag; //rates fragment
     private ErrorFeed errorFeedFrag; //error fragment
@@ -423,14 +424,14 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             public void handleMessage(@NonNull Message msg) {
                 //check the message type
                 if(msg.what == RSS_FEED_DATA_UPDATE){
-                    //set view model data
-                    currencyVM.setRssFeedData((RssFeedData) msg.obj);
-                    currencyVM.setLastPublished(currencyVM.getRssFeedData().getLastBuildDate());
-                    //makes toast to show data was updated.
-                    Toast.makeText(getApplicationContext(),
-                                    "RSS Data Updated",
-                                    Toast.LENGTH_SHORT)
-                            .show();
+                        //set view model data
+                        currencyVM.setRssFeedData((RssFeedData) msg.obj);
+                        currencyVM.setLastPublished(currencyVM.getRssFeedData().getLastBuildDate());
+                        //makes toast to show data was updated.
+                        Toast.makeText(getApplicationContext(),
+                                        "RSS Data Updated",
+                                        Toast.LENGTH_SHORT)
+                                .show();
                 }
                 //check the message type
                 else if(msg.what == RSS_RATE_PROGRESS_UPDATE){
@@ -476,6 +477,9 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                                         Toast.LENGTH_SHORT)
                                 .show();
                     }
+                }
+                else if(msg.what == ERROR_FEED_DATA){
+                    openFragment(errorFeedFrag);
                 }
             }
         };

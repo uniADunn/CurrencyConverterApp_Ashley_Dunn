@@ -16,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.List;
 
 import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.*;
 
@@ -25,8 +24,9 @@ public class RSSCurrency implements Runnable{
     private final static int RSS_FEED_DATA_UPDATE = 1; //update feed data message
     private final static int RSS_RATES_DATA_UPDATE = 2; //update rates feed data message
     private final static int RSS_RATE_PROGRESS_UPDATE = 3; //update for progress updates
+    private static final int ERROR_FEED_DATA = 4;//update ui if errors
 
-    private static String urlSource = "https://www.fx-exchange.com/gbp/rss.xml"; //url source: https://www.fx-exchange.com/gbp/rss.xml
+    private static String urlSource = ""; //url source: https://www.fx-exchange.com/gbp/rss.xml
     private String result= "";//result of parsing
     private final Handler rssDataHandler; //handler for updating UI
     private ArrayList<CurrencyRate> rates; //list of currency rates
@@ -56,6 +56,7 @@ public class RSSCurrency implements Runnable{
             in.close();
         } catch (MalformedURLException e) {
             Log.e("RSSCurrency", "Malformed URL Exception: " + e.getMessage());
+            updateUI(ERROR_FEED_DATA, null);
             return;
         }
         catch(IOException e){
