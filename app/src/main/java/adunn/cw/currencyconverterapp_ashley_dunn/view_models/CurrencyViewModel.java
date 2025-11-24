@@ -13,7 +13,6 @@ public class CurrencyViewModel extends ViewModel {
     private double highThreshold;//high threshold for colour
     private RssFeedData rssData;//rss data details
     private ArrayList<CurrencyRate> rates;//hold rates
-    private ArrayList<CurrencyRate> filteredRates; // holds filtered rates
     private String lastPublished;//last published date
     //private String inputSearch; // user query input
     private boolean isFiltered = false; //true if filtered

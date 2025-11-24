@@ -88,13 +88,14 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         setToolbar();
         //create fragments
         createFragments();
+
+        //create the ui update handler
+        createUpdateUIHandler();
         try {
             fileLoad();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        //create the ui update handler
-        createUpdateUIHandler();
     }
     private void fileSave() {
         if (currencyVM.getRates() == null || currencyVM.getRates().isEmpty()) {
@@ -108,7 +109,12 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         try {
             fileOutStream = new FileOutputStream(file);
             objectOutStream = new ObjectOutputStream(fileOutStream);
-            objectOutStream.writeObject(currencyVM.getRates());
+            //objects to be saved
+            objectOutStream.writeObject(currencyVM.getRates());//rates
+            objectOutStream.writeObject(currencyVM.getLastPublished());//last published
+            objectOutStream.writeObject(currencyVM.getLowThreshold());//low threshold
+            objectOutStream.writeObject(currencyVM.getHighThreshold());//high threshold
+            //flush)
             objectOutStream.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -140,7 +146,15 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             objectInStream = new ObjectInputStream(fileInStream);
 
             ArrayList<CurrencyRate> rates = (ArrayList<CurrencyRate>) objectInStream.readObject();
+            String lastPublished = (String) objectInStream.readObject();
+            double lowThresh = (double) objectInStream.readObject();
+            double highThresh = (double) objectInStream.readObject();
+
             currencyVM.setRates(rates);
+            currencyVM.setLastPublished(lastPublished);
+            currencyVM.setLowThreshold(lowThresh);
+            currencyVM.setHighThreshold(highThresh);
+            currencyVM.buildRateLists();
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }

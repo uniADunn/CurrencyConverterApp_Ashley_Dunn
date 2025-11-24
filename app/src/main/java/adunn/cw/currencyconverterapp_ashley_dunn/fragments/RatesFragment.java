@@ -78,8 +78,7 @@ public class RatesFragment extends Fragment implements RecViewAdapter.OnRateClic
             transaction.addToBackStack(null);
         }
         transaction.commit();
-        //update recycler view
-        rcRates.setAdapter(rcAdapter);
+
     }
     //create and set recycler adapter
     private void createRecViewAdapter(){
