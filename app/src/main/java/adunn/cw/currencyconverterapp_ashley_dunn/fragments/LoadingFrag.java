@@ -14,8 +14,8 @@ import adunn.cw.currencyconverterapp_ashley_dunn.R;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class LoadingFrag extends Fragment {
-    public ProgressBar bar1;
-    private TextView txtTitleBar;
+    public ProgressBar bar1;//progress bar
+    private TextView txtTitleBar;//progress bar title
 
 
     @Override
@@ -27,13 +27,13 @@ public class LoadingFrag extends Fragment {
         bar1.setMin(0);
         return v;
     }
-
+    //set progress bar max (total amount of items in currency feed
     public void setProgressBarMax(int max) {
         if (bar1 != null) {
             bar1.setMax(max);
         }
     }
-
+    //set progress bar
     public void setProgress(int progress) {
         if (bar1 != null) {
             bar1.setProgress(progress);

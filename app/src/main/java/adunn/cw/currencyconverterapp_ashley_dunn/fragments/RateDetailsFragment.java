@@ -20,12 +20,12 @@ import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class RateDetailsFragment extends Fragment {
-    private CurrencyViewModel currencyVM;
-    private TextView codeResult;
-    private TextView titleResult;
-    private TextView rateResult;
-    private TextView exchangeRate;
-    private ImageView flagImage;
+    private CurrencyViewModel currencyVM;//view model
+    private TextView codeResult;//code result
+    private TextView titleResult;//title result
+    private TextView rateResult;//rate result
+    private TextView exchangeRate;//exchange result
+    private ImageView flagImage;//flag image
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,6 +36,7 @@ public class RateDetailsFragment extends Fragment {
         addFlagImage();
         return v;
     }
+    //add flag image to selected rate
     private void addFlagImage(){
         CurrencyRate rate = currencyVM.getRateSelected().getValue();
         if((rate != null ? rate.getFlagUrl() : null) != null){
@@ -48,22 +49,24 @@ public class RateDetailsFragment extends Fragment {
                     .into(flagImage);
         }
     }
+    //observe view model
     private void observeVM(){
         currencyVM.getRateSelected().observe(getViewLifecycleOwner(), rateSelected -> {
-
+            //if rate selected is not null
             if (rateSelected != null) {
                 codeResult.setText(rateSelected.getCountryCode());
                 titleResult.setText(rateSelected.getTitle());
                 rateResult.setText(String.valueOf(rateSelected.getRate()));
                 updateExchangeRate(rateSelected, currencyVM.getInputAmountLive().getValue());
             } else {
+                //rate selected is null
                 codeResult.setText("");
                 titleResult.setText("");
                 rateResult.setText("");
                 exchangeRate.setText("--");
             }
         });
-
+        //get input amount from view model
         currencyVM.getInputAmountLive().observe(getViewLifecycleOwner(), inputAmount -> {
 
             CurrencyRate rateSelected = currencyVM.getRateSelected().getValue();
@@ -71,16 +74,16 @@ public class RateDetailsFragment extends Fragment {
                 updateExchangeRate(rateSelected, inputAmount);
             }
         });
-
+        //check conversion direction
         currencyVM.getGbpToXLive().observe(getViewLifecycleOwner(), isGbpToX -> {
-
+            //update exchange rate
             CurrencyRate rateSelected = currencyVM.getRateSelected().getValue();
             if (rateSelected != null) {
                 updateExchangeRate(rateSelected, currencyVM.getInputAmountLive().getValue());
             }
         });
     }
-
+    //update exchange rate
     private void updateExchangeRate(CurrencyRate rateSelected, String inputAmount) {
 
         if (inputAmount == null || inputAmount.isEmpty()) {
@@ -102,7 +105,7 @@ public class RateDetailsFragment extends Fragment {
 
         }
     }
-
+    //calculate the exchange rate
     private BigDecimal calculateRate(String inputAmount, String strRate){
         try {
             BigDecimal input = new BigDecimal(inputAmount);
@@ -122,6 +125,7 @@ public class RateDetailsFragment extends Fragment {
             return BigDecimal.ZERO;
         }
     }
+    //set view widgets
     private void setWidgets(View v){
         codeResult = v.findViewById(R.id.rcCode);
         titleResult = v.findViewById(R.id.rcTitle);

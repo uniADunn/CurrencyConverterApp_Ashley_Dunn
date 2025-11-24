@@ -8,10 +8,10 @@ import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.RssFeedData;
 
 public class CurrencyViewModel extends ViewModel {
-    private boolean isHorizontal;
-    private double lowThreshold;
-    private double highThreshold;
-    private RssFeedData rssData;
+    private boolean isHorizontal; //flag if in landscape mode
+    private double lowThreshold; //low threshold for colour
+    private double highThreshold;//high threshold for colour
+    private RssFeedData rssData;//rss data details
     private ArrayList<CurrencyRate> rates;//hold rates
     private ArrayList<CurrencyRate> filteredRates; // holds filtered rates
     private String lastPublished;//last published date
@@ -20,7 +20,8 @@ public class CurrencyViewModel extends ViewModel {
     private final MutableLiveData<String> inputSearchLive = new MutableLiveData<>();//live user input data: query
     private final MutableLiveData<String> inputAmountLive = new MutableLiveData<>("");//live user input data: amount
     private final MutableLiveData<Boolean> gbpToXLive = new MutableLiveData<>(true);//true if GBP to X (false if X to GBP)
-    private final MutableLiveData<CurrencyRate> rateSelectedLive = new MutableLiveData<>();
+    private final MutableLiveData<CurrencyRate> rateSelectedLive = new MutableLiveData<>();//selected rate
+    //build lists for recycler view based on vm fields
     public ArrayList<CurrencyRate> buildRateLists() {
         Log.d("currency view model", "buildRateLists: building Rates...");
         ArrayList<CurrencyRate> allRates = (rates != null) ? rates : new ArrayList<>();
@@ -41,6 +42,7 @@ public class CurrencyViewModel extends ViewModel {
             return sortRatesByCountryCode(outRates); // Return only the search results
         }
         if (isFiltered) {
+            //filter toggle is set to true
             for (CurrencyRate r : allRates) {
                 String code = r.getCountryCode().toUpperCase();
                 if ("USD".equals(code) || "EUR".equals(code) || "JPY".equals(code)) {
@@ -48,10 +50,12 @@ public class CurrencyViewModel extends ViewModel {
                 }
             }
         } else {
+            //filtered rates is false show all rates
             outRates.addAll(allRates);
         }
         return sortRatesByCountryCode(outRates);
     }
+    //sort rates by country code
     private ArrayList<CurrencyRate> sortRatesByCountryCode(ArrayList<CurrencyRate> rates){
         rates.sort((r1,r2)->{
             String c1 = r1.getCountryCode() == null ? "" : r1.getCountryCode();
@@ -60,6 +64,7 @@ public class CurrencyViewModel extends ViewModel {
         });
         return rates;
     }
+    //getters and setters
     public void setHorizontal(boolean isHorizontal){
         this.isHorizontal = isHorizontal;
     }

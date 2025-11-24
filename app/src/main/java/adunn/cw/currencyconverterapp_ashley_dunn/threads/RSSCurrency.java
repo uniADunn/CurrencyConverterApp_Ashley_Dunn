@@ -87,7 +87,7 @@ public class RSSCurrency implements Runnable{
             RssFeedData rssFeedData = new RssFeedData();
             CurrencyRate currencyRate = null;
 
-            ArrayList<CurrencyRate> tempRates = new ArrayList<>(); // list to hold parsed rates
+            ArrayList<CurrencyRate> tempRates = new ArrayList<>(); // list to hold rates
 
             //parse to get total number of items, by counting the amount of start tags that start with item
             XmlPullParser xppForCount = factory.newPullParser();
@@ -196,9 +196,10 @@ public class RSSCurrency implements Runnable{
                 }
                 eventType = xpp.next();
             }//end of while
+            //add rates to rss feed data and rates in view model
             rates.addAll(tempRates);
             rssFeedData.setItems(rates);
-
+            //update main thread
             updateUI(RSS_FEED_DATA_UPDATE, rssFeedData);
             updateUI(RSS_RATES_DATA_UPDATE, rates);
         }
@@ -207,6 +208,7 @@ public class RSSCurrency implements Runnable{
         }
         Log.d("RSSCurrency", "RSS DATA UPDATE COMPLETE!!!");
     }
+    //update ui with rss data
     private void updateUI(int update, Object updateData){
         Message msg = new Message();
         msg.what = update;
@@ -214,7 +216,7 @@ public class RSSCurrency implements Runnable{
         rssDataHandler.sendMessage(msg);
     }
 
-    //progress updates
+    //update ui with progress
     private void updateUIProgress(int what, int progress, int max) {
         Message msg = new Message();
         msg.what = what;

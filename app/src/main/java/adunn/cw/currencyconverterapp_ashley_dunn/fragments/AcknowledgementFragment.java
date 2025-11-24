@@ -13,7 +13,7 @@ import adunn.cw.currencyconverterapp_ashley_dunn.R;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class AcknowledgementFragment extends Fragment {
-    private CurrencyViewModel currencyVM;
+    private CurrencyViewModel currencyVM;//view model
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){

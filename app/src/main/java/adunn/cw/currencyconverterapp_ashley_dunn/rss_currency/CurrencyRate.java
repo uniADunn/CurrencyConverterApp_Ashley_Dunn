@@ -5,19 +5,20 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 public class CurrencyRate {
-    private String title;
-    private String countryCode;
-    private String flagUrlCode;
-    private String flagUrl;
-    private String strRate;
-    private double rate;
-    private String link;
-    private String guid;
-    private String pubDate;
-    private String description;
-    private String category;
-
+    private String title;//title
+    private String countryCode;//code
+    private String flagUrlCode;//flag url code
+    private String flagUrl;//flag url
+    private String strRate;//str rate
+    private double rate;//parsed rate
+    private String link;//link
+    private String guid;//link
+    private String pubDate;//publish date
+    private String description;//description of rate
+    private String category;//category
+    //constructor
     public CurrencyRate(){}
+    //create flag url from country code
     public void createFlagUrlCode(){
 
         //special cases
@@ -39,6 +40,7 @@ public class CurrencyRate {
             flagUrl = "https://flagsapi.com/" + flagUrlCode + "/shiny/64.png";
         }
     }
+    //getters and setters
     public String getFlagUrl(){
         return flagUrl;
     }
@@ -76,6 +78,7 @@ public class CurrencyRate {
         this.category = category;
     }
 
+    //extract title and code
     public void extractTitle(){
         if (this.title == null) {
             this.title = "";
@@ -98,11 +101,13 @@ public class CurrencyRate {
         }
         //Log.d("Title extracted", title);
     }
+    //extract country code
     public void extractCode(String code){
         //set country code
         countryCode = code.substring(code.lastIndexOf("(")+1, code.lastIndexOf(")"));
         //Log.d("code extracted", countryCode);
     }
+    //extract rate
     public void extractRate(){
         if (this.description == null) {
             this.description = "";
@@ -128,6 +133,7 @@ public class CurrencyRate {
         }
         //Log.d("rate", this.strRate);
     }
+    //convert rate to double from string
     public void rateConvert(){
         try{
             this.rate = Double.parseDouble(this.strRate);

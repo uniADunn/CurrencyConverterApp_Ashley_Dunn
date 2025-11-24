@@ -18,9 +18,9 @@ import adunn.cw.currencyconverterapp_ashley_dunn.threads.RSSCurrency;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class ErrorFeed extends Fragment {
-    private TextView errorTxt;
-    private Button updateBtn;
-    private CurrencyViewModel currencyVM;
+    private TextView errorTxt;//error text message
+    private Button updateBtn;//button to call update for rates data
+    private CurrencyViewModel currencyVM;//currency view model
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.error_feed_layout, container, false);
@@ -28,6 +28,7 @@ public class ErrorFeed extends Fragment {
         setWidgets(v);
         return v;
     }
+    //set widgets and update button on click listener
     private void setWidgets(View v) {
         errorTxt = v.findViewById(R.id.error_message);
         updateBtn = v.findViewById(R.id.update_button);
@@ -37,8 +38,6 @@ public class ErrorFeed extends Fragment {
                 RSSCurrency.setURLTEST("https://www.fx-exchange.com/gbp/rss.xml");// used for testing no rates available
                 ((MainActivity) requireActivity()).updateRssData();
                 ((MainActivity) requireActivity()).openFragment(new LoadingFrag());
-
-
             }
         });
     }

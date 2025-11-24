@@ -26,9 +26,9 @@ import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class RatesFragment extends Fragment implements RecViewAdapter.OnRateClickListener{
-    private RecyclerView rcRates;
-    private RecViewAdapter rcAdapter;
-    private CurrencyViewModel currencyVM;
+    private RecyclerView rcRates; //recycler to view rates
+    private RecViewAdapter rcAdapter;//recycler adapter
+    private CurrencyViewModel currencyVM;//view model
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -41,14 +41,17 @@ public class RatesFragment extends Fragment implements RecViewAdapter.OnRateClic
         return v;
 
     }
+    //on rate click
     @Override
     public void onRateClick(int position){
         CurrencyRate rate = rcAdapter.getItem(position);
         FragmentManager manager = requireActivity().getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-
+        //if rate is not null
         if (rate != null) {
+            //set selected rate in view model
             currencyVM.setRateSelected(rate);
+            //set toolbar title
             Toolbar toolbar = requireActivity().findViewById(R.id.toolbar);
             Menu menu = toolbar.getMenu();
             //set title
@@ -62,10 +65,12 @@ public class RatesFragment extends Fragment implements RecViewAdapter.OnRateClic
             MenuItem item2 = menu.findItem(R.id.action_filterToggle);
             item2.setVisible(false);
         }
+        //check if in landscape mode
         if(currencyVM.isHorizontal()){
             Log.d("onRateClick", "in landscape mode");
             transaction.replace(R.id.main_frame2_layout, new ConversionFragment());
         }
+        //in portrait mode
         else{
             Log.d("onRateClick", "in portrait mode");
             transaction.replace(R.id.main_frame_layout, new ConversionFragment());
@@ -73,21 +78,26 @@ public class RatesFragment extends Fragment implements RecViewAdapter.OnRateClic
             transaction.addToBackStack(null);
         }
         transaction.commit();
+        //update recycler view
         rcRates.setAdapter(rcAdapter);
     }
+    //create and set recycler adapter
     private void createRecViewAdapter(){
         rcAdapter = new RecViewAdapter(currencyVM);
         rcAdapter.setRateClickListener(this);
         rcRates.setAdapter(rcAdapter);
     }
+    //set rates widget
     private void setWidgets(View v){
         rcRates = v.findViewById(R.id.rcRates);
     }
+    //set layout manager
     private void setLayoutManager(){
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rcRates.setLayoutManager(llm);
     }
+    //update recycler view
     public void updateRecView(){
         if(rcAdapter != null && currencyVM != null){
             if(currencyVM.getRates() != null){

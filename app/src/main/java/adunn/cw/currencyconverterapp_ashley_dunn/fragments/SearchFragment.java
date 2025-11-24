@@ -16,13 +16,14 @@ import adunn.cw.currencyconverterapp_ashley_dunn.R;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class SearchFragment extends Fragment {
+    //on search listener
     public interface OnSearchListener{
         void onSearch(String query);
     }
-    private OnSearchListener searchListener;
-    private CurrencyViewModel currencyVM;
-    private EditText searchInput;
-    private boolean updatingFromVM = false;
+    private OnSearchListener searchListener;//listener
+    private CurrencyViewModel currencyVM;//view model
+    private EditText searchInput;//search input
+    private boolean updatingFromVM = false;//flag if updating from view model
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class SearchFragment extends Fragment {
         watchSearchInput();
         return v;
     }
+    //set search widget and text if not null
     private void setWidgets(View v){
         searchInput = v.findViewById(R.id.inputSearch);
         if(currencyVM.getInputSearchLive().getValue() != null){
@@ -41,6 +43,7 @@ public class SearchFragment extends Fragment {
             searchInput.setHint("Search Currency...");
         }
     }
+    //observe view model for changes
     private void observeVM(){
         currencyVM.getInputSearchLive().observe(getViewLifecycleOwner(), query ->{
             if(query == null || query.isEmpty()){
@@ -55,10 +58,12 @@ public class SearchFragment extends Fragment {
             }
         });
     }
+    //watch search input for changes
     private void watchSearchInput(){
         searchInput.addTextChangedListener(new TextWatcher(){
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after){}
+            //update view model on text changed
             @Override
             public void onTextChanged(CharSequence s, int start, int count, int after){
                 if(!updatingFromVM){
@@ -70,6 +75,7 @@ public class SearchFragment extends Fragment {
             public void afterTextChanged(android.text.Editable s){}
         });
     }
+    //onAttach
     public void onAttach(@NonNull Context context){
         super.onAttach(context);
         if(context instanceof OnSearchListener){
@@ -79,6 +85,7 @@ public class SearchFragment extends Fragment {
             throw new RuntimeException(context + " Must implement OnSearchListener");
         }
     }
+    //onDetach
     @Override
     public void onDetach(){
         super.onDetach();

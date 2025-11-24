@@ -22,40 +22,44 @@ import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHolder> {
 
-
+    //on rate click listener
     public interface OnRateClickListener{
         void onRateClick(int position);
     }
-    private OnRateClickListener rateClickListener;
+    private OnRateClickListener rateClickListener; //listener for rate click
     private static final String TAG = "RecViewAdapter";
     private ArrayList<CurrencyRate> dataSet; //container for data in the recycler view
     private CurrencyViewModel currencyVM; //access to the view model
 
+    //constructor
     public RecViewAdapter(CurrencyViewModel vm){
         currencyVM = vm;
         dataSet = new ArrayList<>();
         setHasStableIds(true);
     }
+    //get country code from item in recycler view
     @Override
     public long getItemId(int position){
         String code = dataSet.get(position).getCountryCode();
         return code == null ? position : code.hashCode();
     }
+    //set listener for rate click
     public void setRateClickListener(OnRateClickListener listener){
         rateClickListener = listener;
     }
+    //update the data set
     public void updateData(ArrayList<CurrencyRate> rates) {
         dataSet = rates != null ? rates : new ArrayList<>();
         notifyDataSetChanged();
     }
-    // New method to get a CurrencyRate at a specific position
+    // get item at specific position
     public CurrencyRate getItem(int position) {
         if (position >= 0 && position < dataSet.size()) {
             return dataSet.get(position);
         }
         return null;
     }
-
+    //view holder class
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private final TextView rcTitle;
         private final TextView rcRate;
@@ -67,14 +71,14 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         public ViewHolder(View v, OnRateClickListener listener, RecViewAdapter adapter){
             super(v);
             this.adapter = adapter; // Initialize the adapter reference
-
+            //get widgets
             rcTitle = v.findViewById(R.id.rcTitle);
             rcRate = v.findViewById(R.id.rcRate);
             rcCode = v.findViewById(R.id.rcCode);
             imageFlag = v.findViewById(R.id.imageFlag);
             recViewLayout = v.findViewById(R.id.recViewLayout);
 
-            //define click listener for the viewholders view
+            //define click listener for the view holders view
             v.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
@@ -85,6 +89,7 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
                 }
             });
         }
+        //getters and setters
         public TextView getRcTitle(){
             return rcTitle;
         }
@@ -102,7 +107,7 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         }
 
     }
-    //create each new item views (this is invoked by the layout manager
+    //create each new item views (this is invoked by the layout manager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType){
         //create a new view inflating our custom item layout
@@ -119,6 +124,7 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         viewHolder.getRcTitle().setText(rate.getTitle());
         viewHolder.getRcRate().setText(rate.getStrRate());
         viewHolder.getRcCode().setText(rate.getCountryCode());
+        //get the flags url from currencyRate and load into glide
         String flagUrl = rate.getFlagUrl();
         if(flagUrl != null){
             Glide.with(viewHolder.itemView.getContext())

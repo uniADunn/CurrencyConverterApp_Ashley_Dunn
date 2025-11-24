@@ -3,32 +3,28 @@ package adunn.cw.currencyconverterapp_ashley_dunn.rss_currency;
 import java.util.List;
 
 public class RssFeedData {
-    private String strVersionNumber;
-    private String title;
-    private String link;
-    private String description;
-    private String lastBuildDate;
-    private String language;
-    private String copyright;
-    private String doc;
-    private String ttl;
-    private List<CurrencyRate> items;
-
+    private String strVersionNumber;//version number
+    private String title;//title
+    private String link;// fx exchange link
+    private String description;//description
+    private String lastBuildDate;//last build date
+    private String language;//language
+    private String copyright; //copyright
+    private String doc;//doc
+    private String ttl;//ttl
+    private List<CurrencyRate> items;//list of currency rates
+    //constructor
     public RssFeedData(){}
-
+    //getters and setters
     public void addItems(CurrencyRate item){
         items.add(item);
     }
-
-
     public String getStrVersionNumber() {
         return strVersionNumber;
     }
-
     public void setStrVersionNumber(String strVersionNumber) {
         this.strVersionNumber = strVersionNumber;
     }
-
     public String getTitle() {
         return title;
     }
