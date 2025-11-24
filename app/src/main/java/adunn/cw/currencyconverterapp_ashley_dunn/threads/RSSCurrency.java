@@ -202,13 +202,8 @@ public class RSSCurrency implements Runnable{
             updateUI(RSS_FEED_DATA_UPDATE, rssFeedData);
             updateUI(RSS_RATES_DATA_UPDATE, rates);
         }
-        catch(XmlPullParserException e){
+        catch(XmlPullParserException | IOException e){
             Log.e("Parsing", "Exception: " + e.getMessage());
-
-        }
-        catch(IOException ioe){
-            Log.e("Parsing", "Exception: " + ioe.getMessage());
-
         }
         Log.d("RSSCurrency", "RSS DATA UPDATE COMPLETE!!!");
     }
@@ -219,7 +214,7 @@ public class RSSCurrency implements Runnable{
         rssDataHandler.sendMessage(msg);
     }
 
-    // New method for sending progress updates
+    //progress updates
     private void updateUIProgress(int what, int progress, int max) {
         Message msg = new Message();
         msg.what = what;
