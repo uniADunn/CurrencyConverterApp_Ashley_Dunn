@@ -25,6 +25,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -47,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     private static final int RSS_RATES_DATA_UPDATE = 2;//update message for thread rates data
     private static final int RSS_RATE_PROGRESS_UPDATE = 3;//update message for progress updates
     private static final int ERROR_FEED_DATA = 4; //update message for error feed data
+    private static final String FILE_NAME = "currency_data.txt"; //file name
     private SearchFragment searchFrag; //search fragment
     private RatesFragment ratesFrag; //rates fragment
     private ErrorFeed errorFeedFrag; //error fragment
@@ -56,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     private Handler updateUIHandler; //handler for updating UI
     private Toolbar toolbar; //toolbar menu
     private boolean isHorizontal; //flag if in landscape mode
+
 
     // on create
     @Override
@@ -70,18 +81,78 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         });
         //create view model
         currencyVM = new ViewModelProvider(this).get(CurrencyViewModel.class);
+
         isHorizontal = findViewById(R.id.main_frame2_layout) != null;
         currencyVM.setHorizontal(findViewById(R.id.main_frame2_layout)!= null);
         //set toolbar
         setToolbar();
         //create fragments
         createFragments();
+        try {
+            fileLoad();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         //create the ui update handler
         createUpdateUIHandler();
+    }
+    private void fileSave() {
+        if (currencyVM.getRates() == null || currencyVM.getRates().isEmpty()) {
+            return; //no rates to save
+        }
+        File dir = getApplication().getFilesDir();
+        String path = dir.getAbsolutePath();
+        File file = new File(path, FILE_NAME);
+        ObjectOutputStream objectOutStream = null;
+        FileOutputStream fileOutStream = null;
+        try {
+            fileOutStream = new FileOutputStream(file);
+            objectOutStream = new ObjectOutputStream(fileOutStream);
+            objectOutStream.writeObject(currencyVM.getRates());
+            objectOutStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (objectOutStream != null) {
+                    objectOutStream.close();
+                }
+                if (fileOutStream != null) {
+                    fileOutStream.close();
+                }
+            } catch (IOException ignored) {
+
+            }
+        }
+    }
+
+    private void fileLoad() throws FileNotFoundException {
+        File dir = getApplication().getFilesDir();
+        String path = dir.getAbsolutePath();
+        File file = new File(path, FILE_NAME);
+        if(!file.exists()){
+            return;//file does not exist
+        }
+        FileInputStream fileInStream = null;
+        ObjectInputStream objectInStream = null;
+        try{
+            fileInStream = new FileInputStream(file);
+            objectInStream = new ObjectInputStream(fileInStream);
+
+            ArrayList<CurrencyRate> rates = (ArrayList<CurrencyRate>) objectInStream.readObject();
+            currencyVM.setRates(rates);
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     @Override
     public void onStart(){
         super.onStart();
+        try {
+            fileLoad();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         if(currencyVM.getRates() != null && !currencyVM.getRates().isEmpty()){
             openFragment(ratesFrag);
         }
@@ -91,8 +162,23 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         }
     }
     @Override
+    public void onPause(){
+        super.onPause();
+        fileSave();
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        fileSave();
+    }
+    @Override
     public void onResume(){
         super.onResume();
+        try {
+            fileLoad();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         if(currencyVM.getRates() != null && !currencyVM.getRates().isEmpty()){
             openFragment(ratesFrag);
         }
