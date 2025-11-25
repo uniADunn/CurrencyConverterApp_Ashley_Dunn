@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import adunn.cw.currencyconverterapp_ashley_dunn.R;
-import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
+import adunn.cw.currencyconverterapp_ashley_dunn.rss_data.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHolder> {

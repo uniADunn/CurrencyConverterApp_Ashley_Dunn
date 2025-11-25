@@ -42,9 +42,10 @@ import adunn.cw.currencyconverterapp_ashley_dunn.fragments.LoadingFrag;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.RateDetailsFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.RatesFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.SearchFragment;
-import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
-import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.RssFeedData;
+import adunn.cw.currencyconverterapp_ashley_dunn.rss_data.CurrencyRate;
+import adunn.cw.currencyconverterapp_ashley_dunn.rss_data.RssFeedData;
 import adunn.cw.currencyconverterapp_ashley_dunn.threads.RSSCurrency;
+import adunn.cw.currencyconverterapp_ashley_dunn.threads.RefreshThread;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class MainActivity extends AppCompatActivity implements SearchFragment.OnSearchListener
@@ -63,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     private Handler updateUIHandler; //handler for updating UI
     private Toolbar toolbar; //toolbar menu
     private boolean isHorizontal; //flag if in landscape mode
+    private RefreshThread refreshThread; //refresh thread
+    private boolean rssLoading = false;//flag for rss loading
+    private Thread rssThread = null;//rss currency thread
+
 
 
     // on create
@@ -78,6 +83,16 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         });
         //create view model
         currencyVM = new ViewModelProvider(this).get(CurrencyViewModel.class);
+        //create the ui update handler
+        createUpdateUIHandler();
+
+        Handler refreshHandler = new Handler(Looper.getMainLooper());
+        refreshThread = new RefreshThread(refreshHandler, new RefreshThread.RefreshListener(){
+            @Override
+            public void onRefreshMinute() {
+                updateRssData(true);
+            }
+        });
 
         isHorizontal = findViewById(R.id.main_frame2_layout) != null;
         currencyVM.setHorizontal(findViewById(R.id.main_frame2_layout)!= null);
@@ -86,9 +101,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         //create fragments
         createFragments();
 
-        //create the ui update handler
-        createUpdateUIHandler();
     }
+    //file operations
     private void fileSave() {
         if (currencyVM.getRates() == null || currencyVM.getRates().isEmpty()) {
             return; //no rates to save
@@ -123,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             }
         }
     }
-
     private void fileLoad() throws FileNotFoundException {
         File dir = getApplication().getFilesDir();
         String path = dir.getAbsolutePath();
@@ -151,19 +164,23 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             throw new RuntimeException(e);
         }
     }
+    //life cycle operations
     @Override
     public void onStart(){
         super.onStart();
         try {
             fileLoad();
+
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
         if(currencyVM.getRates() != null && !currencyVM.getRates().isEmpty()){
             openFragment(ratesFrag);
+            refreshThread.start();
         }
         else{
-            updateRssData();
+            updateRssData(false);
+            refreshThread.start();
             welcomeDialogCustom();
         }
     }
@@ -171,20 +188,24 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     public void onPause(){
         super.onPause();
         fileSave();
+        refreshThread.stop();
     }
     @Override
     public void onStop(){
         super.onStop();
         fileSave();
+        refreshThread.stop();
     }
     @Override
     public void onResume(){
         super.onResume();
         if(currencyVM.getRates() != null && !currencyVM.getRates().isEmpty()){
             openFragment(ratesFrag);
+            refreshThread.start();
         }
         else{
-            updateRssData();
+            updateRssData(false);
+            refreshThread.start();
         }
     }
 
@@ -378,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
             invalidateOptionsMenu();
         }
         else if(item.getItemId() == reload.getItemId()) {
-            updateRssData();
+            updateRssData(false);
         }
         else if(item.getItemId() == acknowledgements.getItemId()){
             showSearch = false;//set flag state
@@ -499,11 +520,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                         //set view model data
                         currencyVM.setRssFeedData((RssFeedData) msg.obj);
                         currencyVM.setLastPublished(currencyVM.getRssFeedData().getLastBuildDate());
-                        //makes toast to show data was updated.
-                        Toast.makeText(getApplicationContext(),
-                                        "RSS Data Updated",
-                                        Toast.LENGTH_SHORT)
-                                .show();
                 }
                 //check the message type
                 else if(msg.what == RSS_RATE_PROGRESS_UPDATE){
@@ -513,9 +529,18 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                     if (loadingFrag != null) {
                         loadingFrag.setProgressBarMax(max);
                         loadingFrag.setProgress(progress);
+                        if(progress == max){
+                            //makes toast to show rates data was updated
+
+                            Toast.makeText(getApplicationContext(),
+                                            "Rates Updated",
+                                            Toast.LENGTH_SHORT)
+                                    .show();
+                        }
                     }
                 }
                 else if(msg.what == RSS_RATES_DATA_UPDATE){
+                    rssLoading = false;
                     if(msg.obj instanceof ArrayList){
                         ArrayList<CurrencyRate> ratesFromRss = (ArrayList<CurrencyRate>) msg.obj;
                         currencyVM.setRates(ratesFromRss);
@@ -541,13 +566,10 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
                         currencyVM.setHighThreshold(highThresh);
                         //update the rates fragment
                         ratesFrag.updateRecView();
-                        // Replace loading fragment with rates fragment after loading is complete
-                        openFragment(ratesFrag);
-                        //makes toast to show rates data was updated
-                        Toast.makeText(getApplicationContext(),
-                                        "Rates Updated",
-                                        Toast.LENGTH_SHORT)
-                                .show();
+                        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.main_frame_layout);
+                        if(currentFragment instanceof LoadingFrag){
+                            openFragment(ratesFrag);
+                        }
                     }
                 }
                 else if(msg.what == ERROR_FEED_DATA){
@@ -557,13 +579,27 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         };
     }
     //THREAD TO UPDATE RSS DATA
-    public void updateRssData() {
-        //open loading fragment
-        openFragment(loadingFrag);
-        //create thread
-        Thread t = new Thread(new RSSCurrency(updateUIHandler));
-        //start thread
-        t.start();
+    public synchronized void updateRssData(boolean autoUpdate) {
+        if(rssLoading){
+            //refresh triggered when rss loading
+            if(autoUpdate){
+                return;//skip update refresh
+            }
+            if(rssThread != null && rssThread.isAlive()){
+                rssThread.interrupt();
+            }
+            updateUIHandler.removeMessages(RSS_FEED_DATA_UPDATE);
+            updateUIHandler.removeMessages(RSS_RATES_DATA_UPDATE);
+            updateUIHandler.removeMessages(RSS_RATE_PROGRESS_UPDATE);
+            updateUIHandler.removeMessages(ERROR_FEED_DATA);
+        }
+        rssLoading = true;
+        if(!autoUpdate){
+            openFragment(loadingFrag);
+
+        }
+        rssThread = new Thread(new RSSCurrency(updateUIHandler));
+        rssThread.start();
     }
     //listener for on search
     @Override

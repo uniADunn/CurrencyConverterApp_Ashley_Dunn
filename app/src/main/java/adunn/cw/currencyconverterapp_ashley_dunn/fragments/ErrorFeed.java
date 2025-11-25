@@ -25,7 +25,7 @@ public class ErrorFeed extends Fragment {
         Button updateBtn = v.findViewById(R.id.update_button);
         updateBtn.setOnClickListener(v1 -> {
             RSSCurrency.setUrlTest("https://www.fx-exchange.com/gbp/rss.xml");// used for testing no rates available
-            ((MainActivity) requireActivity()).updateRssData();
+            ((MainActivity) requireActivity()).updateRssData(false);
             ((MainActivity) requireActivity()).openFragment(new LoadingFrag());
         });
     }

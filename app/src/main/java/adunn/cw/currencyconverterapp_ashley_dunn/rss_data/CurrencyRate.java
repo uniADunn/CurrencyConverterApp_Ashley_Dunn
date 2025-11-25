@@ -1,4 +1,4 @@
-package adunn.cw.currencyconverterapp_ashley_dunn.rss_currency;
+package adunn.cw.currencyconverterapp_ashley_dunn.rss_data;
 
 import android.util.Log;
 

@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import adunn.cw.currencyconverterapp_ashley_dunn.R;
-import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
+import adunn.cw.currencyconverterapp_ashley_dunn.rss_data.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class InputControlFragment extends Fragment {

@@ -17,7 +17,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.*;
+import adunn.cw.currencyconverterapp_ashley_dunn.rss_data.*;
 
 public class RSSCurrency implements Runnable{
 
@@ -26,7 +26,7 @@ public class RSSCurrency implements Runnable{
     private final static int RSS_RATE_PROGRESS_UPDATE = 3; //update for progress updates
     private static final int ERROR_FEED_DATA = 4;//update ui if errors
     //blank for testing purposes, once error feed fragment button on click triggers source is updated to -> url source: https://www.fx-exchange.com/gbp/rss.xml
-    private static String urlSource = "";
+    private static String urlSource = "";//removed to show error feed fragment
     private String result= "";//result of parsing
     private final Handler rssDataHandler; //handler for updating UI
     private ArrayList<CurrencyRate> rates; //list of currency rates
@@ -210,18 +210,28 @@ public class RSSCurrency implements Runnable{
     }
     //update ui with rss data
     private void updateUI(int update, Object updateData){
-        Message msg = new Message();
-        msg.what = update;
-        msg.obj = updateData;
-        rssDataHandler.sendMessage(msg);
+        if(Thread.currentThread().isInterrupted()){
+            return;
+        }
+        else {
+            Message msg = new Message();
+            msg.what = update;
+            msg.obj = updateData;
+            rssDataHandler.sendMessage(msg);
+        }
     }
 
     //update ui with progress
     private void updateUIProgress(int updateProgress, int progress, int max) {
-        Message msg = new Message();
-        msg.what = updateProgress;
-        msg.arg1 = progress; // current progress
-        msg.arg2 = max;      // max value for the progress bar
-        rssDataHandler.sendMessage(msg);
+        if (Thread.currentThread().isInterrupted()) {
+            return;
+        }
+        else {
+            Message msg = new Message();
+            msg.what = updateProgress;
+            msg.arg1 = progress; // current progress
+            msg.arg2 = max;      // max value for the progress bar
+            rssDataHandler.sendMessage(msg);
+        }
     }
 }

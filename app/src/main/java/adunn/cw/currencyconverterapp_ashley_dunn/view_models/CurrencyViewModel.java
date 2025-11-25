@@ -4,8 +4,8 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
-import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
-import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.RssFeedData;
+import adunn.cw.currencyconverterapp_ashley_dunn.rss_data.CurrencyRate;
+import adunn.cw.currencyconverterapp_ashley_dunn.rss_data.RssFeedData;
 
 public class CurrencyViewModel extends ViewModel {
     private boolean isHorizontal; //flag if in landscape mode
@@ -22,7 +22,7 @@ public class CurrencyViewModel extends ViewModel {
     private final MutableLiveData<CurrencyRate> rateSelectedLive = new MutableLiveData<>();//selected rate
     //build lists for recycler view based on vm fields
     public ArrayList<CurrencyRate> buildRateLists() {
-        Log.d("currency view model", "buildRateLists: building Rates...");
+        //Log.d("currency view model", "buildRateLists: building Rates...");
         ArrayList<CurrencyRate> allRates = (rates != null) ? rates : new ArrayList<>();
         ArrayList<CurrencyRate> outRates = new ArrayList<>();
 

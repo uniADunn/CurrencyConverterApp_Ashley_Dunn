@@ -17,7 +17,7 @@ import java.math.RoundingMode;
 import java.util.Objects;
 
 import adunn.cw.currencyconverterapp_ashley_dunn.R;
-import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
+import adunn.cw.currencyconverterapp_ashley_dunn.rss_data.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class RateDetailsFragment extends Fragment {
