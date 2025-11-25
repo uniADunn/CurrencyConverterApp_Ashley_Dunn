@@ -7,11 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ToggleButton;
-
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -51,12 +48,9 @@ public class InputControlFragment extends Fragment {
             @Override public void afterTextChanged(Editable s){}
         });
         //set conversion direction toggle
-        convertToggle.setOnCheckedChangeListener(new ToggleButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
-                currencyVM.setGbpToX(isChecked);
-                updateToggleText(currencyVM.getRateSelected().getValue(), isChecked);
-            }
+        convertToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            currencyVM.setGbpToX(isChecked);
+            updateToggleText(currencyVM.getRateSelected().getValue(), isChecked);
         });
     }
     //observe view model for changes
@@ -70,9 +64,8 @@ public class InputControlFragment extends Fragment {
             }
         });
         //update toggle text when rate selected changes
-        currencyVM.getRateSelected().observe(getViewLifecycleOwner(), rate -> {
-            updateToggleText(rate, currencyVM.isGbpToX());
-        });
+        currencyVM.getRateSelected().observe(getViewLifecycleOwner(), rate ->
+                updateToggleText(rate, currencyVM.isGbpToX()));
     }
     //set widgets for input control
     private void setWidgets(View v){

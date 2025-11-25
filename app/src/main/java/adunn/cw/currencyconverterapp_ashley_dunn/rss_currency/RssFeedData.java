@@ -16,9 +16,6 @@ public class RssFeedData {
     //constructor
     public RssFeedData(){}
     //getters and setters
-    public void addItems(CurrencyRate item){
-        items.add(item);
-    }
     public String getStrVersionNumber() {
         return strVersionNumber;
     }

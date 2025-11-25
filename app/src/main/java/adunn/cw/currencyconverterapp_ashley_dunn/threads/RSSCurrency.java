@@ -25,13 +25,13 @@ public class RSSCurrency implements Runnable{
     private final static int RSS_RATES_DATA_UPDATE = 2; //update rates feed data message
     private final static int RSS_RATE_PROGRESS_UPDATE = 3; //update for progress updates
     private static final int ERROR_FEED_DATA = 4;//update ui if errors
-
-    private static String urlSource = ""; //url source: https://www.fx-exchange.com/gbp/rss.xml
+    //blank for testing purposes, once error feed fragment button on click triggers source is updated to -> url source: https://www.fx-exchange.com/gbp/rss.xml
+    private static String urlSource = "";
     private String result= "";//result of parsing
     private final Handler rssDataHandler; //handler for updating UI
     private ArrayList<CurrencyRate> rates; //list of currency rates
     //CONSTRUCTOR
-    public static void setURLTEST(String url){
+    public static void setUrlTest(String url){
         urlSource = url;
     }
     public RSSCurrency(Handler uiHandler){
@@ -81,8 +81,8 @@ public class RSSCurrency implements Runnable{
             xpp.setInput(new StringReader(result));
 
             //parse here
-            int eventType = xpp.getEventType();
-            String text = "";
+            int eventType;
+            String text;
             boolean isItem = false;
             RssFeedData rssFeedData = new RssFeedData();
             CurrencyRate currencyRate = null;
@@ -217,9 +217,9 @@ public class RSSCurrency implements Runnable{
     }
 
     //update ui with progress
-    private void updateUIProgress(int what, int progress, int max) {
+    private void updateUIProgress(int updateProgress, int progress, int max) {
         Message msg = new Message();
-        msg.what = what;
+        msg.what = updateProgress;
         msg.arg1 = progress; // current progress
         msg.arg2 = max;      // max value for the progress bar
         rssDataHandler.sendMessage(msg);

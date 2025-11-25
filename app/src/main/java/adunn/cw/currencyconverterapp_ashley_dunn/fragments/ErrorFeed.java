@@ -1,44 +1,32 @@
 package adunn.cw.currencyconverterapp_ashley_dunn.fragments;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import adunn.cw.currencyconverterapp_ashley_dunn.MainActivity;
 import adunn.cw.currencyconverterapp_ashley_dunn.R;
 import adunn.cw.currencyconverterapp_ashley_dunn.threads.RSSCurrency;
-import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class ErrorFeed extends Fragment {
-    private TextView errorTxt;//error text message
-    private Button updateBtn;//button to call update for rates data
-    private CurrencyViewModel currencyVM;//currency view model
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.error_feed_layout, container, false);
-        currencyVM = new ViewModelProvider(requireActivity()).get(CurrencyViewModel.class);
+        //currency view model
         setWidgets(v);
         return v;
     }
     //set widgets and update button on click listener
     private void setWidgets(View v) {
-        errorTxt = v.findViewById(R.id.error_message);
-        updateBtn = v.findViewById(R.id.update_button);
-        updateBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                RSSCurrency.setURLTEST("https://www.fx-exchange.com/gbp/rss.xml");// used for testing no rates available
-                ((MainActivity) requireActivity()).updateRssData();
-                ((MainActivity) requireActivity()).openFragment(new LoadingFrag());
-            }
+        //update data button
+        //button to call update for rates data
+        Button updateBtn = v.findViewById(R.id.update_button);
+        updateBtn.setOnClickListener(v1 -> {
+            RSSCurrency.setUrlTest("https://www.fx-exchange.com/gbp/rss.xml");// used for testing no rates available
+            ((MainActivity) requireActivity()).updateRssData();
+            ((MainActivity) requireActivity()).openFragment(new LoadingFrag());
         });
     }
 }

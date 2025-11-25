@@ -11,12 +11,11 @@ import adunn.cw.currencyconverterapp_ashley_dunn.R;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
 
 public class ConversionFragment extends Fragment {
-    private static final String TAG = "ConversionFragment";
-    private CurrencyViewModel currencyVM;//view model
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        currencyVM = new ViewModelProvider(requireActivity()).get(CurrencyViewModel.class);
+        //view model
+        CurrencyViewModel currencyVM = new ViewModelProvider(requireActivity()).get(CurrencyViewModel.class);
         View v = inflater.inflate(R.layout.conversion_layout, container, false);//set parent fragment view
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         //set child fragments into parent fragment

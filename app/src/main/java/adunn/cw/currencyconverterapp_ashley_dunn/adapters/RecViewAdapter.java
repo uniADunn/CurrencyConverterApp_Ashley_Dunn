@@ -1,21 +1,17 @@
 package adunn.cw.currencyconverterapp_ashley_dunn.adapters;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
-
 import adunn.cw.currencyconverterapp_ashley_dunn.R;
 import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
 import adunn.cw.currencyconverterapp_ashley_dunn.view_models.CurrencyViewModel;
@@ -27,7 +23,6 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         void onRateClick(int position);
     }
     private OnRateClickListener rateClickListener; //listener for rate click
-    private static final String TAG = "RecViewAdapter";
     private ArrayList<CurrencyRate> dataSet; //container for data in the recycler view
     private CurrencyViewModel currencyVM; //access to the view model
 
@@ -48,6 +43,7 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         rateClickListener = listener;
     }
     //update the data set
+    @SuppressLint("NotifyDataSetChanged")
     public void updateData(ArrayList<CurrencyRate> rates) {
         dataSet = rates != null ? rates : new ArrayList<>();
         notifyDataSetChanged();
@@ -66,11 +62,10 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
         private final TextView rcCode;
         private final ImageView imageFlag;
         private ConstraintLayout recViewLayout;
-        private RecViewAdapter adapter; // Reference to the adapter
 
         public ViewHolder(View v, OnRateClickListener listener, RecViewAdapter adapter){
             super(v);
-            this.adapter = adapter; // Initialize the adapter reference
+            // Reference to the adapter
             //get widgets
             rcTitle = v.findViewById(R.id.rcTitle);
             rcRate = v.findViewById(R.id.rcRate);
@@ -79,13 +74,10 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
             recViewLayout = v.findViewById(R.id.recViewLayout);
 
             //define click listener for the view holders view
-            v.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    int position = getAbsoluteAdapterPosition();
-                    if(listener != null && position != RecyclerView.NO_POSITION && position < adapter.getItemCount()){
-                        listener.onRateClick(position);
-                    }
+            v.setOnClickListener(v1 -> {
+                int position = getAbsoluteAdapterPosition();
+                if(listener != null && position != RecyclerView.NO_POSITION && position < adapter.getItemCount()){
+                    listener.onRateClick(position);
                 }
             });
         }
@@ -108,6 +100,7 @@ public class RecViewAdapter extends RecyclerView.Adapter<RecViewAdapter.ViewHold
 
     }
     //create each new item views (this is invoked by the layout manager)
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType){
         //create a new view inflating our custom item layout

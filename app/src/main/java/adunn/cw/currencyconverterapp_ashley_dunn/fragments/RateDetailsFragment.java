@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 import adunn.cw.currencyconverterapp_ashley_dunn.R;
 import adunn.cw.currencyconverterapp_ashley_dunn.rss_currency.CurrencyRate;
@@ -26,6 +27,7 @@ public class RateDetailsFragment extends Fragment {
     private TextView rateResult;//rate result
     private TextView exchangeRate;//exchange result
     private ImageView flagImage;//flag image
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -132,6 +134,9 @@ public class RateDetailsFragment extends Fragment {
         rateResult = v.findViewById(R.id.rcRate);
         exchangeRate = v.findViewById(R.id.rcExchangeRate);
         flagImage = v.findViewById(R.id.imageFlag);
+        //published date
+        TextView ratePublished = v.findViewById(R.id.rate_published);
+        ratePublished.setText(Objects.requireNonNull(currencyVM.getRateSelected().getValue()).getPubDate());
     }
 
 }

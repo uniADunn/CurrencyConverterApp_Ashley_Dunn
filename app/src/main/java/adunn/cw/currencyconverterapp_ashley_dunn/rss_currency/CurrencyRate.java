@@ -10,12 +10,11 @@ public class CurrencyRate implements Serializable {
     private static final long serialVersionUID = 1L;
     private String title;//title
     private String countryCode;//code
-    private String flagUrlCode;//flag url code
     private String flagUrl;//flag url
     private String strRate;//str rate
     private double rate;//parsed rate
     private String link;//link
-    private String guid;//link
+    private String guid;//guid
     private String pubDate;//publish date
     private String description;//description of rate
     private String category;//category
@@ -25,6 +24,8 @@ public class CurrencyRate implements Serializable {
     public void createFlagUrlCode(){
 
         //special cases
+        //flag url code
+        String flagUrlCode;
         switch (countryCode){
             case "EUR":
                 flagUrlCode = "eu";
@@ -44,6 +45,7 @@ public class CurrencyRate implements Serializable {
         }
     }
     //getters and setters
+
     public String getFlagUrl(){
         return flagUrl;
     }
@@ -73,6 +75,9 @@ public class CurrencyRate implements Serializable {
     }
     public void setPubDate(String pubDate) {
         this.pubDate = pubDate;
+    }
+    public String getPubDate(){
+        return pubDate;
     }
     public void setDescription(String description) {
         this.description = description;

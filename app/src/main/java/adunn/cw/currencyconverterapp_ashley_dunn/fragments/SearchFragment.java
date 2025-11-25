@@ -53,7 +53,9 @@ public class SearchFragment extends Fragment {
             if(!currentStr.equals(query)){
                 updatingFromVM = true;
                 searchInput.setText(query);
-                searchInput.setSelection(query.length());
+                if (query != null) {
+                    searchInput.setSelection(query.length());
+                }
                 updatingFromVM = false;
             }
         });

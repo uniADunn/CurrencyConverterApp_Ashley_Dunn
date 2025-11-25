@@ -1,7 +1,6 @@
 package adunn.cw.currencyconverterapp_ashley_dunn;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,7 +25,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,7 +35,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import adunn.cw.currencyconverterapp_ashley_dunn.adapters.RecViewAdapter;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.AcknowledgementFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ConversionFragment;
 import adunn.cw.currencyconverterapp_ashley_dunn.fragments.ErrorFeed;
@@ -91,11 +88,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
 
         //create the ui update handler
         createUpdateUIHandler();
-        try {
-            fileLoad();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
     private void fileSave() {
         if (currencyVM.getRates() == null || currencyVM.getRates().isEmpty()) {
@@ -139,8 +131,8 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         if(!file.exists()){
             return;//file does not exist
         }
-        FileInputStream fileInStream = null;
-        ObjectInputStream objectInStream = null;
+        FileInputStream fileInStream;
+        ObjectInputStream objectInStream;
         try{
             fileInStream = new FileInputStream(file);
             objectInStream = new ObjectInputStream(fileInStream);
@@ -188,11 +180,6 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
     @Override
     public void onResume(){
         super.onResume();
-        try {
-            fileLoad();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         if(currencyVM.getRates() != null && !currencyVM.getRates().isEmpty()){
             openFragment(ratesFrag);
         }
@@ -212,25 +199,19 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         builder.setTitle(R.string.string_welcome_dialog_title);
         //create the dialog and set onShow listener
         AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener(){
-            @Override
-            public void onShow(DialogInterface d){
-                //get the dialog object
-                AlertDialog dialog = (AlertDialog) d;
-                //get the text view and set the text
-                TextView customDialogText = dialog.findViewById(R.id.customDialogText);
-                customDialogText.setText(R.string.string_welcome_dialog_text);
-                //get the button and set the text and onClick listener
-                Button OKBtn = dialog.findViewById(R.id.customDialogButton);
-                OKBtn.setText(R.string.string_string_custom_dialog_button_text);
-                OKBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //ok button dismisses dialog
-                        dialog.dismiss();
-                    }
-                });
-            }
+        dialog.setOnShowListener(d -> {
+            //get the dialog object
+            AlertDialog dialog1 = (AlertDialog) d;
+            //get the text view and set the text
+            TextView customDialogText = dialog1.findViewById(R.id.customDialogText);
+            customDialogText.setText(R.string.string_welcome_dialog_text);
+            //get the button and set the text and onClick listener
+            Button OKBtn = dialog1.findViewById(R.id.customDialogButton);
+            OKBtn.setText(R.string.string_string_custom_dialog_button_text);
+            OKBtn.setOnClickListener(v -> {
+                //ok button dismisses dialog
+                dialog1.dismiss();
+            });
         });
         //show the dialog
         dialog.show();
@@ -245,36 +226,27 @@ public class MainActivity extends AppCompatActivity implements SearchFragment.On
         builder.setTitle("Exit Application");
         //create the dialog and set onShow listener
         AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener(){
-            @Override
-            public void onShow(DialogInterface d) {
-                //get the dialog object
-                AlertDialog dialog = (AlertDialog) d;
-                //get yes button and set onClickListener
-                Button yesBtn = dialog.findViewById(R.id.yes_btn);
-                yesBtn.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v){
-                        //yes button: shows toast and closes application
-                        Toast.makeText(getApplicationContext(),
-                                "Exiting Application",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                });
-                //get no button and set onClick listener
-                Button noBtn = dialog.findViewById(R.id.no_btn);
-                noBtn.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v){
-                        //no button: shows toast and dismisses dialog
-                        Toast.makeText(getApplicationContext(),
-                                "Exit Cancelled",
-                                Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                    }
-                });
-            }
+        dialog.setOnShowListener(d -> {
+            //get the dialog object
+            AlertDialog dialog1 = (AlertDialog) d;
+            //get yes button and set onClickListener
+            Button yesBtn = dialog1.findViewById(R.id.yes_btn);
+            yesBtn.setOnClickListener(v -> {
+                //yes button: shows toast and closes application
+                Toast.makeText(getApplicationContext(),
+                        "Exiting Application",
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            });
+            //get no button and set onClick listener
+            Button noBtn = dialog1.findViewById(R.id.no_btn);
+            noBtn.setOnClickListener(v -> {
+                //no button: shows toast and dismisses dialog
+                Toast.makeText(getApplicationContext(),
+                        "Exit Cancelled",
+                        Toast.LENGTH_SHORT).show();
+                dialog1.dismiss();
+            });
         });
         //show dialog
         dialog.show();
