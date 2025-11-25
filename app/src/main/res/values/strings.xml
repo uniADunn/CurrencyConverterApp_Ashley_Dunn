@@ -8,4 +8,27 @@
     <string name="string_string_custom_dialog_button_text">OK, Lets Go!</string>
     <string name="search_by_currency_title_or_code">"Search Currency title or code: "</string>
     <string name="gbp">"GBP £"</string>
+    <string name="currency_exchange_data_by_www_fx_exchange_com">Currency Exchange Data by: www.fx-exchange.com</string>
+    <string name="last_published">Last published:</string>
+    <string name="search_icon_by_www_icons8_com">Search Icon by: www.icons8.com</string>
+    <string name="flag_icons_by_www_flagsapi_com_and_www_flagpedia_net">Flag icons by: www.flagsapi.com and www.flagpedia.net</string>
+    <string name="ok">OK</string>
+    <string name="error_retrieving_currency_rate_data">Error retrieving currency rate data!</string>
+    <string name="update_data">Update Data</string>
+    <string name="are_you_sure_you_want_to_exit">Are you sure you want to exit?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="amount">Amount</string>
+    <string name="gbp_x"><![CDATA[GBP --> X]]></string>
+    <string name="x_gbp"><![CDATA[X --> GBP]]></string>
+    <string name="loading_data">Loading data...</string>
+    <string name="current_rate">Current Rate:</string>
+    <string name="currency_last_published">Currency Last Published:</string>
+    <string name="flag_images">Flag Images</string>
+    <string name="search_currency">Search Currency...</string>
+    <string name="search">search</string>
+    <string name="common_rates">Common Rates</string>
+    <string name="reload_data">Reload Data</string>
+    <string name="acknowledgements">Acknowledgements</string>
+    <string name="exit">Exit</string>
 </resources>

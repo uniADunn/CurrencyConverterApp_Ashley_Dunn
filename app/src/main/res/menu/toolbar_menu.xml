@@ -5,21 +5,21 @@
         android:id="@+id/action_search"
         app:showAsAction="ifRoom"
         android:icon="@drawable/search_icon"
-        android:title="search"
+        android:title="@string/search"
         />
     <item
         android:id="@+id/action_filterToggle"
         app:showAsAction="always"
-        android:title="Common Rates"
+        android:title="@string/common_rates"
         />
     <item
         android:id="@+id/action_reload"
-        android:title="Reload Data"/>
+        android:title="@string/reload_data"/>
     <item
         android:id="@+id/action_acknowledgements"
-        android:title="Acknowledgements">
+        android:title="@string/acknowledgements">
     </item>
     <item
         android:id="@+id/action_exit"
-        android:title="Exit"/>
+        android:title="@string/exit"/>
 </menu>

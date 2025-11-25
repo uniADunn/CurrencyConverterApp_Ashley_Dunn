@@ -20,6 +20,7 @@
         android:id="@+id/inputSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:autofillHints="none"
         android:padding="10dp"
         android:layout_marginEnd="4dp"
         android:textAlignment="textEnd"
@@ -27,6 +28,6 @@
         app:flow_horizontalAlign="end"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:hint="Search Currency..."/>
+        android:hint="@string/search_currency"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

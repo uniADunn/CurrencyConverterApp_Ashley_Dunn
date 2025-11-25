@@ -9,7 +9,6 @@
         android:id="@+id/customDialogText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello"
         android:padding="10dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,7 +17,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="OK"
+        android:text="@string/ok"
         android:id="@+id/customDialogButton"
         app:layout_constraintTop_toBottomOf="@id/customDialogText"
         app:layout_constraintStart_toStartOf="parent"
