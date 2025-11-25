@@ -210,10 +210,7 @@ public class RSSCurrency implements Runnable{
     }
     //update ui with rss data
     private void updateUI(int update, Object updateData){
-        if(Thread.currentThread().isInterrupted()){
-            return;
-        }
-        else {
+        if(!Thread.currentThread().isInterrupted()){
             Message msg = new Message();
             msg.what = update;
             msg.obj = updateData;
@@ -223,10 +220,7 @@ public class RSSCurrency implements Runnable{
 
     //update ui with progress
     private void updateUIProgress(int updateProgress, int progress, int max) {
-        if (Thread.currentThread().isInterrupted()) {
-            return;
-        }
-        else {
+        if (!Thread.currentThread().isInterrupted()) {
             Message msg = new Message();
             msg.what = updateProgress;
             msg.arg1 = progress; // current progress
