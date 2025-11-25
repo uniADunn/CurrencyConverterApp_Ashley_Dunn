@@ -26,7 +26,7 @@ public class RSSCurrency implements Runnable{
     private final static int RSS_RATE_PROGRESS_UPDATE = 3; //update for progress updates
     private static final int ERROR_FEED_DATA = 4;//update ui if errors
     //blank for testing purposes, once error feed fragment button on click triggers source is updated to -> url source: https://www.fx-exchange.com/gbp/rss.xml
-    private static String urlSource = "";//removed to show error feed fragment
+    private static String urlSource = "https://www.fx-exchange.com/gbp/rss.xml";//removed to show error feed fragment
     private String result= "";//result of parsing
     private final Handler rssDataHandler; //handler for updating UI
     private ArrayList<CurrencyRate> rates; //list of currency rates
